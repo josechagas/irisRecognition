@@ -73,42 +73,42 @@ def iris():
 ##### Iris
 
 #Initial
-#      irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L01.jpg")
-     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R01.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L02.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R02.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L03.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R03.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L04.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R04.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R05.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L05.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R06.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L06.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R07.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L07.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L08.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R08.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L09.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R09.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R10.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L10.jpg")
+#      irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R03.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R04.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R05.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R06.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L06.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R07.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L07.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L08.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R08.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L09.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R09.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R10.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L10.jpg")
 #
 # #others
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/1.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/2.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/3.jpg")#with canny
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/4.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/5.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/6.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/7.jpg")#not working
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/8.jpg")#not working
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/9.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/10.jpg")#not working
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/11.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/12.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/13.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/14.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/7.jpg")#not working
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/8.jpg")#not working
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/9.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/10.jpg")#not working
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/11.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
 
 def eyelids():
 ##### Iris
