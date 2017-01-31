@@ -1,4 +1,5 @@
 import IrisProcessing as irisP
+import DaugmanIrisProcessing as dIrisP
 
 def pupilV1():
 ###### Pupil
@@ -68,13 +69,48 @@ def pupilV2():
 #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/13.jpg")#3
 #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/14.jpg")#3
 
+def pupilV3():
+
+## Picamera
+
+    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/5.jpg") #not working
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/6.jpg") #not working
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/7.jpg") #not working
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/8.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/9.jpg")
+#    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/10.jpg")
+
+# # others
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")#2
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")#2
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#3
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")#2
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")#2
+#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")#3
 
 def iris():
 ##### Iris
+## Picamera
+
+    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/5.jpg") #not working
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/6.jpg") #not working
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/7.jpg") #not working
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/8.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/9.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/10.jpg")
+
 
 #Initial
 #      irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
@@ -109,6 +145,8 @@ def iris():
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
+
+
 
 def eyelids():
 ##### Iris
@@ -151,36 +189,20 @@ def eyelids():
 #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
 #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
 
+#integration
+#https://docs.scipy.org/doc/scipy-0.18.1/reference/integrate.html
+#convolution
+#https://docs.scipy.org/doc/numpy-1.10.1/reference/routines.math.html
+
 
 def main():
     print "ola"
-
-
     ###### Pupil
-
-    #pupilV1()
-    #pupilV1_5()
-    #pupilV2()
-
+    pupilV3()
     ###### Iris
-    iris()
+    #iris()
 
-    ###### Eyelids
-    #eyelids()
-
-
-
-
-
-
-    ######## Eyelids
-
-    #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L01.jpg")
-    #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R01.jpg")
-        #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L02.jpg")
-    #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R02.jpg")
-    #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L03.jpg")
-    #irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R03.jpg")
+    #dIrisP.inte_difer_Operator([[]])
 
 
 main()

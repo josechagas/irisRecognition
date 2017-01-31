@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import math
 
+#import scipy.integrate as integrate
+
 def captureVideoFromCamera():
     cap = cv2.VideoCapture(0)
 
@@ -36,7 +38,7 @@ def showImage(image,title):
 def drawCirclesOnImage(image,circles,filled=False):
     thickness = 2
     if filled: thickness = -1
-    for i in circles:
+    for i in circles[0:]:
         # draw the outer circle
         cv2.circle(image, (i[0], i[1]), i[2], (255, 255, 255), thickness, 2)
         # draw the center of the circle
@@ -120,6 +122,21 @@ def __irisCodification(eyeImage,pupilCircle,irisCircle,showProcess=False):
     cv2.destroyAllWindows()
 
 
+# def __baseFunction(eyeImage,p,q,w,theta0,r0,alpha,betha):
+#     partOne = math.exp(-math.sqrt(-1) * w*(theta0 - q))
+#     partTwo = math.exp(-(r0 - p) ** 2) / alpha ** 2
+#     partThree = math.exp(-(theta0 - q) ** 2) / betha ** 2
+#     function = eyeImage[p][q]*partOne*partTwo*partThree
+#     return function
+#
+# def __2dGabor_Q_Integral(eyeImage,p,w,theta0,r0,alpha,betha,initialValue,finalValue):
+#     return integrate.quad(__baseFunction,initialValue,finalValue,args=(eyeImage,p,w,theta0,r0,alpha,betha))
+#
+# def DaugmanIrisCodification(eyeImage,pupilCircle,irisCircle):
+#     value = __2dGabor_Q_Integral(eyeImage,10,10,10,10,10,0, 90)
+#     return value
+
+
 #This method try to find iris outer countorn
 #eyeImage must have the pupil paited of black
 #pupilCircle = circle that represents the pupil region
@@ -170,13 +187,18 @@ def __irisCircleOnImage(blackedPupilEyeImage,pupilCircle,showProcess):
     #return bestIrisCircle
     return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
 
-def __irisCircleOnImageV1(blackedPupilEyeImage,pupilCircle,showProcess=False):
+def __irisCircleOnImageV1(eyeImage,pupilCircle,showProcess=False):
     # eyeImage.shape[0] lines
     # eyeImage.shape[1] columns
 
+
+    blackedPupilEyeImage = eyeImage.copy()
+    drawCirclesOnImage(blackedPupilEyeImage,[pupilCircle],True)
+
+    if showProcess: showImage(blackedPupilEyeImage, "Painted pupil")
+
     center = (blackedPupilEyeImage.shape[0] / 2, blackedPupilEyeImage.shape[1] / 2)
     processedImage = cv2.medianBlur(blackedPupilEyeImage, 11)
-
     if showProcess: showImage(processedImage, "Median Blurred Iris Image")
 
     i = 30
@@ -213,6 +235,58 @@ def __irisCircleOnImageV1(blackedPupilEyeImage,pupilCircle,showProcess=False):
     print bestIrisCircle[2]
     #return bestIrisCircle
     return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
+
+
+def __irisCircleOnImageV2(eyeImage,pupilCircle,showProcess=False):
+    blackedPupilEyeImage = eyeImage.copy()
+    drawCirclesOnImage(blackedPupilEyeImage,[pupilCircle],True)
+
+    if showProcess: showImage(blackedPupilEyeImage, "Painted pupil")
+
+    center = (blackedPupilEyeImage.shape[0] / 2, blackedPupilEyeImage.shape[1] / 2)
+    #processedImage = cv2.medianBlur(blackedPupilEyeImage, 11)
+    processedImage = cv2.bilateralFilter(blackedPupilEyeImage, 30, 10, 100, 25)
+    #processedImage = cv2.GaussianBlur(blackedPupilEyeImage, (9,9), 3, 3)  # change on 1_5
+
+    #processedImage = cv2.medianBlur(blackedPupilEyeImage,11)
+    #processedImage = cv2.bilateralFilter(processedImage, 30, 10, 100, 25)
+    if showProcess: showImage(processedImage, "Median Blurred Iris Image")
+
+    i = 30
+    max = 100
+    bestIrisCircle = None
+    while (i < max and bestIrisCircle is None):
+        print "tentativa "+str(i - 30)
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
+        if i == max - 1:
+            print "teste"
+        if objCircles is None:
+            print"No Circles were found"
+        elif objCircles.__len__() > 0:
+            circles = objCircles[0]
+            if circles.__len__() > 0:
+                if circles.__len__() == 1:
+                    bestIrisCircle = circles[0]
+                else:
+                    if bestIrisCircle is None:
+                        bestIrisCircle = circles[0]
+                    lastDistance = __distanceBetweenPoints(pupilCircle[0], pupilCircle[1], bestIrisCircle[0],
+                                                             bestIrisCircle[1])
+                    for k in circles:
+                        d = __distanceBetweenPoints(pupilCircle[0], pupilCircle[1], k[0], k[1])
+                        if d == 0 and k[2] > pupilCircle[2]:
+                            return k
+                        elif d < lastDistance:
+                            lastDistance = d
+                            bestIrisCircle = k
+
+        i += 1
+
+    print int(pupilCircle[2] + 20)
+    print bestIrisCircle[2]
+    #return bestIrisCircle
+    return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
+
 
 
 #This method tries to find the region that corresponds to pupil
@@ -396,6 +470,87 @@ def __pupilCircleOnImageV2(eyeImage,showProcess=False):
 
 
 
+#make all other images work
+def __pupilCircleOnImageV3(eyeImage,showProcess=False):
+    width = eyeImage.shape[1]
+    height = eyeImage.shape[0]
+    average = np.median(eyeImage)
+    center = (width / 2, height / 2)  # change on 2 fixing
+
+    if showProcess : showImage(eyeImage, "Original Iris Image")
+
+    print "primeira tentativa da pupila"
+    #processedImage = cv2.Canny(eyeImage, 150, 50, 3)
+    #if showProcess:  showImage(processedImage, "After Apply Canny")
+
+    preprocessedImage = cv2.inRange(eyeImage,0,average+average*0.3)
+    if showProcess: showImage(preprocessedImage, "preprocessed binary Image")
+    processedImage = eyeImage*(preprocessedImage/255)
+
+    if showProcess: showImage(processedImage, "preprocessed Image")
+
+    processedImage = cv2.medianBlur(processedImage, 11)
+
+    #processedImage = cv2.bilateralFilter(eyeImage, 30, 10, 100, 25)
+    #processedImage = cv2.GaussianBlur(eyeImage, (9,9), 3, 3)  # change on 1_5
+
+    #processedImage = cv2.medianBlur(eyeImage,11)
+    #processedImage = cv2.bilateralFilter(processedImage, 30, 10, 100, 25)
+
+    if showProcess: showImage(processedImage, "Median Blurred Iris Image")
+    # processedImage = cv2.Canny(processedImage, 50, 70, 3)
+    # if showProcess:  showImage(processedImage, "After Apply Canny")
+    # objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 127, 1,10)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 9, 1,5)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 9, 1,5)
+
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 100, 1,5)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 60, 1,5)
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 150, 60,1,5)
+
+    if objCircles is None:
+        print "segunda tentativa da pupila"
+        #processedImage = cv2.bilateralFilter(eyeImage, 30, 50, 100, 25)
+        processedImage = cv2.bilateralFilter(eyeImage, 30, 10, 100, 25)
+        if showProcess: showImage(processedImage, "Bilateral Filtered Iris Image")
+        #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,151)
+        #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 70, 1,10)
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 60, 1, 5)
+
+    if objCircles is None:
+        print "terceira tentativa da pupila"
+        baseKSize = 9
+        blurKSize = (baseKSize, baseKSize)
+
+        processedImage = cv2.GaussianBlur(eyeImage, blurKSize, 3, 3)  # change on 1_5
+
+        if showProcess: showImage(processedImage, "Gaussian Blurred Iris Image")
+
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,
+                                      151)  # change on 2 works on all initial
+        # objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 127,1,10)#change on 2 works on all initial
+
+    if objCircles is None:
+        print "quarta tentativa da pupila"
+        if showProcess: showImage(eyeImage, "Original Iris Image")
+        objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200,200)  # change on 2 works on all initial
+
+    if objCircles is None:
+        raise Exception("No Circles were found")
+    elif objCircles.__len__() > 0:
+        circles = objCircles[0]
+        if circles.__len__() > 0:
+            circle = circles[0]
+            if circles.__len__() > 1:
+                print("found "+str(circles.__len__())+" circles")# change on V2
+                copiedImage = eyeImage.copy()
+                drawCirclesOnImage(copiedImage,circles,False)
+                showImage(copiedImage, "Found these ones")
+            return circle
+    return objCircles
+
+
 #not in use
 def __averageOfAreaOnCircle(image,circle):
     img = image.copy()
@@ -432,7 +587,7 @@ def __eyelidsLines(eyeImage,showProcess):
 def tryToShowPupil(path):
     eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     try:
-        pupilCircle = __pupilCircleOnImageV2(eyeImage, True)
+        pupilCircle = __pupilCircleOnImageV3(eyeImage, True)
         drawCirclesOnImage(eyeImage,[pupilCircle])
         showImage(eyeImage,"Circles found on Iris Image")
     except Exception, e:
@@ -449,6 +604,20 @@ def showEyeLidsOnImageAtPath(path):
     except Exception, e:
         print e
 
+def segmentIrisOnImage(eyeImage):
+
+    copyImage = cv2.cvtColor(eyeImage, cv2.COLOR_BGR2GRAY)
+    #cv2.cvtColor(eyeImage,cv2.COLOR_BAYER_BG2GRAY)#eyeImage.copy()
+    try:
+        pupilCircle = __pupilCircleOnImageV2(copyImage,True)
+
+        irisCircle = __irisCircleOnImageV1(copyImage,pupilCircle,True)
+        drawCirclesOnImage(copyImage,[irisCircle])
+        showImage(copyImage,"Circles for Iris found on Iris Image")
+
+
+    except Exception, e:
+        print e
 
 
 def segmentIrisOnImageAtPath(path):
@@ -456,19 +625,17 @@ def segmentIrisOnImageAtPath(path):
     eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     copyImage = eyeImage.copy()
     try:
-        pupilCircle = __pupilCircleOnImageV2(copyImage,True)
-
-        drawCirclesOnImage(copyImage,[pupilCircle],True)
-        showImage(copyImage,"Painted pupil")
-
-        irisCircle = __irisCircleOnImageV1(copyImage,pupilCircle,True)
+        pupilCircle = __pupilCircleOnImageV3(copyImage,True)
+        irisCircle = __irisCircleOnImageV2(copyImage,pupilCircle,True)
         drawCirclesOnImage(copyImage,[irisCircle])
         showImage(copyImage,"Circles for Iris found on Iris Image")
 
-        __irisCodification(eyeImage,pupilCircle,irisCircle,True)
 
     except Exception, e:
         print e
+
+
+
 
 
 
