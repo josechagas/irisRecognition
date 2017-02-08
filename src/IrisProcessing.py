@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import math
-
 #import scipy.integrate as integrate
 
 def captureVideoFromCamera():
@@ -66,10 +65,12 @@ def drawLinesOnImage(image,lines):
 #topLefPoint = the top left corner point
 #width = width of rectangle
 #height = height of rectangle
-def drawRectangleOnImage(image,topLeftPoint,width,height):
-
+def drawRectangleOnImage(image,topLeftPoint,width,height,filled=False):
+    thickness = 2
+    if filled: thickness = -1
     bottomRightPoint = (topLeftPoint[0]+width,topLeftPoint[1]+height)
-    cv2.rectangle(image,topLeftPoint,bottomRightPoint,(255,255,255))
+    cv2.rectangle(image,topLeftPoint,bottomRightPoint,(255,255,255),thickness)
+
 
 #returns a rectangle based on parameters
 #circle region
@@ -91,51 +92,100 @@ def __distanceBetweenPoints(px1,py1,px2,py2):
     b = math.sqrt(a)
     return b
 
-# this method codificates the iris region, preparing it to be saved and/or recognized
-# eyeImage = the original image with iris
-#pupilCircle = the circle that represents the pupil region
-#irisCircle = the circle that represents the iris region
-#showProcess = Boolean value that indicates if you want to see steps of process
-def __irisCodification(eyeImage,pupilCircle,irisCircle,showProcess=False):
-    copyImage = eyeImage.copy()
-    # rect inside iris circle
-    # heightOne = int(irisCircle[2]  - 5)
-    # widthOne =  int(math.sqrt((irisCircle[2] ** 2) - (heightOne ** 2)/4)*2)
+# this method return the corresponding point(x,y) for some angle on the border of circle
+def __maxPointsOfCircleForAngle(circle,angle):
+    r = circle[2]
+    centerX = circle[0]
+    centerY = circle[1]
+    x = int(centerX + r * math.cos(angle * math.pi / 180))
+    y = int(centerY + r * math.sin(angle * math.pi / 180))
+    return(x,y)
 
-    # rect with radio equal iris circle
-    offSetBy = (0, -3*int(irisCircle[2] - pupilCircle[2])/2)#(widthOffset,heightOffset)
-    rectOutIris = rectangleOfCircle(irisCircle,offSetBy)
-    if showProcess: drawRectangleOnImage(copyImage, (rectOutIris[0],rectOutIris[1]), rectOutIris[2],rectOutIris[3])  # iris region rectangle
+def __pixelsOfCircle(image,circle,showProcess=False):
+    lins = int(circle[2])  # int(irisCircle[2] - pupilCircle[2])
+    cols = 360#int((irisCircle[2] - pupilCircle[2]) + 2)
+    circleData = np.zeros((lins, cols), np.uint8)
+
+    for ri in range(0,lins):
+        line = np.zeros(360, np.uint8)
+        for angle in range(0,cols):
+            x = int(circle[0] + ri*math.cos(angle*math.pi/180))
+            y = int(circle[1] + ri * math.sin(angle * math.pi / 180))
+            line[angle] = image[y][x]
+        circleData[ri] = line
+
+    if showProcess: showImage(circleData,"Pixels on Circle")
+    return circleData
+
+#This method calculates and returns the corresponding point of circle on its border for some angle
+def __pointOfCircle(circle,angle):
+    rads = angle * math.pi / 180
+    cosValue = math.cos(rads)
+    sinValue = math.sin(rads)
+    x = int(circle[0] + circle[2] * cosValue)
+    y = int(circle[1] + circle[2] * sinValue)
+    return [x,y]
+
+#This method extracts the iris information
+#pupilRadioOffset this value indicates how many pixels you want to increment on pupil radio to avoid the possibility
+#to appear some pupil pixels
+#The size of normalized image depends of irisRadio - pupilRadio, that can change because of pupil dilation for example
+def __normalizeIrisRegion(eyeImage,pupilCircle,irisCircle,pupilRadioOffset=0):
+    lins = int(irisCircle[2] - pupilCircle[2] - pupilRadioOffset)  # int(irisCircle[2] - pupilCircle[2])
+    cols = 360#int((irisCircle[2] - pupilCircle[2]) + 2)
+    irisData = np.zeros((lins, cols), np.uint8)
+
+    xDif = irisCircle[0] - pupilCircle[0]
+    yDif = irisCircle[1] - pupilCircle[1]
+
+    for ri in range(int(pupilCircle[2] + pupilRadioOffset),irisCircle[2]):
+        line = np.zeros(360, np.uint8)
+        for angle in range(0,cols):
+            cosValue = math.cos(angle*math.pi/180)
+            sinValue = math.sin(angle * math.pi / 180)
+            x = int(irisCircle[0] + (ri - xDif*cosValue)*cosValue)
+            y = int(irisCircle[1] + (ri - yDif*sinValue) * sinValue)
+            line[angle] = eyeImage[y][x]
+        irisData[int(ri - pupilCircle[2] - pupilRadioOffset)] = line
+
+    return irisData
+
+#Rubber Sheet Model
+# this method normalize the iris region using the same method of Daugman, so the normalized image
+#always has the same dimensions fixing some problems like pupil dilation and other thing that might cause
+#changes on normalized iris region image size
+def __RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset=0):
+    numbOfCols = 360
+    irisData = np.zeros((numbOfLins, numbOfCols), np.uint8)
+    for p in np.arange(0.0, 1.0, 1.0 / numbOfLins):
+        line = np.zeros(numbOfCols, np.uint8)
+        for angle in range(0,360,360/numbOfCols):
+            pupilPoint = __pointOfCircle([pupilCircle[0],pupilCircle[1],pupilCircle[2]+pupilOffset],angle)
+            irisPoint = __pointOfCircle(irisCircle,angle)
+            xo = int((1-p)*pupilPoint[0] + p*irisPoint[0])
+            yo = int((1-p)*pupilPoint[1] + p*irisPoint[1])
+            line[angle] = eyeImage[yo][xo]
+        irisData[int(p*numbOfLins)] = line
+    return irisData
 
 
-    rectOutPupil = rectangleOfCircle(pupilCircle)
-    if showProcess: drawRectangleOnImage(copyImage, (rectOutPupil[0], rectOutPupil[1]), rectOutPupil[2],
-                                         rectOutPupil[3])  # iris region rectangle
 
-    # only iris region image
-    irisRectImage = eyeImage[rectOutIris[1]:rectOutIris[1] + rectOutIris[3],
-                    rectOutIris[0]:rectOutIris[0] + rectOutIris[2]]
-
-    cv2.imshow("cropped iris rect", irisRectImage)
-    cv2.imshow("iris image", copyImage)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
-# def __baseFunction(eyeImage,p,q,w,theta0,r0,alpha,betha):
-#     partOne = math.exp(-math.sqrt(-1) * w*(theta0 - q))
-#     partTwo = math.exp(-(r0 - p) ** 2) / alpha ** 2
-#     partThree = math.exp(-(theta0 - q) ** 2) / betha ** 2
-#     function = eyeImage[p][q]*partOne*partTwo*partThree
-#     return function
-#
-# def __2dGabor_Q_Integral(eyeImage,p,w,theta0,r0,alpha,betha,initialValue,finalValue):
-#     return integrate.quad(__baseFunction,initialValue,finalValue,args=(eyeImage,p,w,theta0,r0,alpha,betha))
-#
-# def DaugmanIrisCodification(eyeImage,pupilCircle,irisCircle):
-#     value = __2dGabor_Q_Integral(eyeImage,10,10,10,10,10,0, 90)
-#     return value
-
+def __codificateIrisData(irisData):
+    cols = irisData.shape[1]
+    lines = irisData.shape[0]
+    #irisCode = np.zeros((lines, cols), np.uint8)
+    irisCode = np.zeros((lines, cols))
+    for y in range(0,lines):
+        #line = np.zeros(cols, np.uint8)
+        line = np.zeros(cols)
+        for x in range(0,cols):
+            pixelValue = irisData[y][x]
+            f0 = irisData[y][0]
+            q = f0 + 10
+            gaborValue = math.exp(-((math.log10(pixelValue/f0))**2)/2*(math.log10(q/f0))**2)
+            line[x] = gaborValue
+        irisCode[y] = line
+    irisCode
 
 #This method try to find iris outer countorn
 #eyeImage must have the pupil paited of black
@@ -235,13 +285,23 @@ def __irisCircleOnImageV1(eyeImage,pupilCircle,showProcess=False):
     print bestIrisCircle[2]
     #return bestIrisCircle
     return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
+    #return [int(pupilCircle[0] + 15),int(pupilCircle[1] + 6),bestIrisCircle[2]]#fixing some deviation on center
 
-
-def __irisCircleOnImageV2(eyeImage,pupilCircle,showProcess=False):
+#raspcamera
+def __irisCircleOnImageRaspCam(eyeImage,pupilCircle,showProcess=False):
     blackedPupilEyeImage = eyeImage.copy()
-    drawCirclesOnImage(blackedPupilEyeImage,[pupilCircle],True)
+    rect = rectangleOfCircle(pupilCircle,(2,2))
+    drawRectangleOnImage(blackedPupilEyeImage,(rect[0],rect[1]),rect[2],rect[3],True)
 
     if showProcess: showImage(blackedPupilEyeImage, "Painted pupil")
+
+    yInitial = int(pupilCircle[1] - 2*pupilCircle[2])
+    yFinal = int(pupilCircle[1] + 2*pupilCircle[2])
+    xInitial = int(pupilCircle[0] - 2*pupilCircle[2])
+    xFinal = int(pupilCircle[0] + 2*pupilCircle[2])
+    blackedPupilEyeImage = blackedPupilEyeImage[yInitial:yFinal,xInitial:xFinal]
+    if showProcess: showImage(blackedPupilEyeImage, "cutted pupil image")
+
 
     center = (blackedPupilEyeImage.shape[0] / 2, blackedPupilEyeImage.shape[1] / 2)
     #processedImage = cv2.medianBlur(blackedPupilEyeImage, 11)
@@ -257,7 +317,7 @@ def __irisCircleOnImageV2(eyeImage,pupilCircle,showProcess=False):
     bestIrisCircle = None
     while (i < max and bestIrisCircle is None):
         print "tentativa "+str(i - 30)
-        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))#
         if i == max - 1:
             print "teste"
         if objCircles is None:
@@ -284,10 +344,15 @@ def __irisCircleOnImageV2(eyeImage,pupilCircle,showProcess=False):
 
     print int(pupilCircle[2] + 20)
     print bestIrisCircle[2]
+
+    drawCirclesOnImage(blackedPupilEyeImage,[bestIrisCircle])
+    showImage(blackedPupilEyeImage,"asd")
+
     #return bestIrisCircle
-    return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
 
+    return np.array([bestIrisCircle[0] + xInitial,bestIrisCircle[1] + yInitial,bestIrisCircle[2]],np.float32)
 
+    #return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
 
 #This method tries to find the region that corresponds to pupil
 def __pupilCircleOnImage(eyeImage,showProcess):
@@ -379,9 +444,8 @@ def __pupilCircleOnImageV1_5(eyeImage,showProcess):
             return circle
     return objCircles
 
-
-
 #make all other images work
+# this is for casia images
 def __pupilCircleOnImageV2(eyeImage,showProcess=False):
     width = eyeImage.shape[1]
     height = eyeImage.shape[0]
@@ -468,10 +532,46 @@ def __pupilCircleOnImageV2(eyeImage,showProcess=False):
             return circle
     return objCircles
 
-
-
-#make all other images work
 def __pupilCircleOnImageV3(eyeImage,showProcess=False):
+    width = eyeImage.shape[1]
+    height = eyeImage.shape[0]
+    average = np.median(eyeImage)
+    center = (width / 2, height / 2)  # change on 2 fixing
+
+    if showProcess : showImage(eyeImage, "Original Iris Image")
+
+    #processedImage = cv2.medianBlur(eyeImage, 11)
+    kernel = np.ones((20, 20), np.uint8)
+    #kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    processedImage = cv2.dilate(eyeImage,kernel,1)
+    #processedImage = cv2.erode(processedImage,kernel,1)
+    processedImage = cv2.morphologyEx(eyeImage, cv2.MORPH_CLOSE, kernel)
+    #processedImage = cv2.morphologyEx(processedImage, cv2.MORPH_GRADIENT, kernel)
+    if showProcess: showImage(processedImage, "preprocessed binary Image")
+
+    processedImage = cv2.Canny(processedImage, 150, 150, 30)
+    if showProcess:  showImage(processedImage, "After Apply Canny")
+
+
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 150, 60,1,5)
+
+    if objCircles is None:
+        raise Exception("No Circles were found")
+    elif objCircles.__len__() > 0:
+        circles = objCircles[0]
+        if circles.__len__() > 0:
+            circle = circles[0]
+            if circles.__len__() > 1:
+                print("found "+str(circles.__len__())+" circles")# change on V2
+                copiedImage = eyeImage.copy()
+                drawCirclesOnImage(copiedImage,circles,False)
+                showImage(copiedImage, "Found these ones")
+            return circle
+    return objCircles
+
+
+#this is for picamera
+def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
     width = eyeImage.shape[1]
     height = eyeImage.shape[0]
     average = np.median(eyeImage)
@@ -514,8 +614,6 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
         #processedImage = cv2.bilateralFilter(eyeImage, 30, 50, 100, 25)
         processedImage = cv2.bilateralFilter(eyeImage, 30, 10, 100, 25)
         if showProcess: showImage(processedImage, "Bilateral Filtered Iris Image")
-        #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,151)
-        #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 70, 1,10)
         objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 60, 1, 5)
 
     if objCircles is None:
@@ -529,8 +627,6 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
 
         objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,
                                       151)  # change on 2 works on all initial
-        # objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 127,1,10)#change on 2 works on all initial
-
     if objCircles is None:
         print "quarta tentativa da pupila"
         if showProcess: showImage(eyeImage, "Original Iris Image")
@@ -551,18 +647,6 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
     return objCircles
 
 
-#not in use
-def __averageOfAreaOnCircle(image,circle):
-    img = image.copy()
-
-    y = int(circle[0]) - 1 - int(circle[2])
-    x = int(circle[1]) + 5 - int(circle[2])
-
-    crop_img = img[y:y + 2 * int(circle[2]),
-               x:x + 2 * int(circle[2])]  # Crop from x, y, w, h -> 100, 200, 300, 400
-    #cv2.imshow("cropped", crop_img)
-    #cv2.waitKey(0)
-    return np.median(crop_img)
 
 
 #The image must be on gray scale
@@ -587,7 +671,7 @@ def __eyelidsLines(eyeImage,showProcess):
 def tryToShowPupil(path):
     eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     try:
-        pupilCircle = __pupilCircleOnImageV3(eyeImage, True)
+        pupilCircle = __pupilCircleOnImageV2(eyeImage, True)
         drawCirclesOnImage(eyeImage,[pupilCircle])
         showImage(eyeImage,"Circles found on Iris Image")
     except Exception, e:
@@ -625,10 +709,27 @@ def segmentIrisOnImageAtPath(path):
     eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     copyImage = eyeImage.copy()
     try:
-        pupilCircle = __pupilCircleOnImageV3(copyImage,True)
-        irisCircle = __irisCircleOnImageV2(copyImage,pupilCircle,True)
+        pupilCircle = __pupilCircleOnImageV2(copyImage,True)
+        irisCircle = __irisCircleOnImageV1(copyImage,pupilCircle,True)
+        #image = __extractIrisData(eyeImage,pupilCircle,irisCircle)
+        #showImage(image,"test")
+
+        #pupilCircle = __pupilCircleOnImageRaspCam(copyImage,True)
+        #irisCircle = __irisCircleOnImageRaspCam(copyImage,pupilCircle,True)
+
         drawCirclesOnImage(copyImage,[irisCircle])
         showImage(copyImage,"Circles for Iris found on Iris Image")
+
+        #irisData = __normalizeIrisRegion(eyeImage, pupilCircle, irisCircle, 6)
+        #showImage(irisData, "Normalized iris data")
+        irisData = __RSM_NormIrisRegion(eyeImage, pupilCircle, irisCircle,50,3)
+        showImage(irisData, "Rubber Sheet Model Normalized iris data")
+
+
+        #irisCode = __codificateIrisData(irisData)
+
+        #showImage(irisCode, "Codificated Iris data")
+
 
 
     except Exception, e:

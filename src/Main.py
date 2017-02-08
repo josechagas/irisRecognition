@@ -96,7 +96,7 @@ def iris():
 ##### Iris
 ## Picamera
 
-    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
+#    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
 #    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
 #    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
 #    irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
@@ -109,8 +109,8 @@ def iris():
 
 
 #Initial
-#      irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
+#     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
 #     irisP.segmentIrisOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
@@ -198,11 +198,11 @@ def eyelids():
 def main():
     print "ola"
     ###### Pupil
-    pupilV3()
+    #pupilV3()
     ###### Iris
-    #iris()
+    iris()
 
-    #dIrisP.inte_difer_Operator([[]])
+    #dIrisP.executeOpForImage("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
 
 
 main()
