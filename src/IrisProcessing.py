@@ -168,21 +168,30 @@ def __RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffs
         irisData[int(p*numbOfLins)] = line
     return irisData
 
-
-
 def __codificateIrisData(irisData):
     cols = irisData.shape[1]
     lines = irisData.shape[0]
     #irisCode = np.zeros((lines, cols), np.uint8)
     irisCode = np.zeros((lines, cols))
+
     for y in range(0,lines):
         #line = np.zeros(cols, np.uint8)
         line = np.zeros(cols)
         for x in range(0,cols):
+            xRads = x*math.pi/180
             pixelValue = irisData[y][x]
-            f0 = irisData[y][0]
-            q = f0 + 10
-            gaborValue = math.exp(-((math.log10(pixelValue/f0))**2)/2*(math.log10(q/f0))**2)
+            #f0 = irisData[y][0]
+            #q = f0 + 10
+            #gaborValue = math.exp(-((math.log10(pixelValue/f0))**2)/2*(math.log10(q/f0))**2)
+            #line[x] = gaborValue
+            w0 = 0.1
+            qw = 0.55
+            radialPart = math.exp(-((math.log10(pixelValue/w0))**2)/(2*(math.log10(qw))**2))
+
+            d0 = 0
+            qd = math.pi / 8
+            anglePart = math.exp(-((xRads - d0)**2)/(2*(qd)**2))
+            gaborValue = radialPart*anglePart
             line[x] = gaborValue
         irisCode[y] = line
     irisCode
@@ -703,8 +712,114 @@ def segmentIrisOnImage(eyeImage):
     except Exception, e:
         print e
 
+#tutorial = http://www.peterkovesi.com/matlabfns/PhaseCongruency/Docs/convexpl.html
+def __2DLogGaborFilter(lins,cols):
+    #radius matrix
+    #populate the radius matrix
+    x = -(cols/2.0)
+    y = -(lins/2.0)
+    radius = np.zeros((lins, cols))
+    for lin in range(0,lins):
+        yLin = (y + lin)/lins
+        line = np.zeros(cols)
+        for col in range(0,cols):
+            xCol = (x + col)/cols
+            line[col] = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
+        radius[lin] = line
+    radius[lins/2][cols/2] = 1
+    #return radius
+
+
+    ################################# radial part of filter
+    waveLenght = 5.0#10.0# at least 2 #######
+    f0 = 1.0/waveLenght
+    sigmaOnf = 0.55#0.75 ########
+    gaborRadial = np.zeros((lins, cols))
+    for lin in range(0,lins):
+        lineLog = np.zeros(cols)
+        for col in range(0,cols):
+            f = radius[lin][col]
+            radialPart = math.exp(-((math.log10(f / f0)) ** 2) / (2 * (math.log10(sigmaOnf)) ** 2))
+            lineLog[col] = radialPart
+        gaborRadial[lin] = lineLog
+    gaborRadial[lins/2][cols/2] = 0
+    #return gaborRadial
+
+    #new = cv2.normalize(gaborRadial,0,1,cv2.NORM_MINMAX)
+    #showImage(new,"read")
+
+    ################################## angular part of filter
+    spread = np.zeros((lins, cols))
+    thetaSigma = 1.5 ######
+    for lin in range(0,lins):
+        yLin = (y + lin)/lins
+        spreadLine = np.zeros(cols)
+        for col in range(0,cols):
+            xCol = (x + col)/cols
+            theta = math.atan2(-yLin,xCol)
+            sinTheta = math.sin(theta)
+            cosTheta = math.cos(theta)
+
+            angl = col*math.pi/180
+            ds = sinTheta*math.cos(angl) - cosTheta*math.sin(angl)
+            dc = cosTheta*math.cos(angl) + sinTheta*math.sin(angl)
+            dTheta = abs(math.atan2(ds,dc))
+
+            anglePart = math.exp(-(dTheta**2)/(2*(thetaSigma)**2))
+            spreadLine[col] = anglePart
+        spread[lin] = spreadLine
+
+    #return spread
+
+    filter = spread*gaborRadial
+    return filter
+
+#http://docs.opencv.org/3.1.0/de/dbc/tutorial_py_fourier_transform.html
+#using numpy
+def __NP_fourierTransformOf(image,showProcess=False):
+    showImage(image,"Image")
+    f = np.fft.fft2(image)
+    fshift = np.fft.fftshift(f)
+    magnitude_spectrum = 20 * np.log(np.abs(fshift))
+    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
+    return fshift
+
+#using cv2
+#teorically faster
+def __CV2_fourierTransformOf(image,showProcess=False):
+    dft = cv2.dft(np.float32(image), flags=cv2.DFT_COMPLEX_OUTPUT)
+    dft_shift = np.fft.fftshift(dft)
+    magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
+    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
+    return dft_shift
+
+def __CV2_invertFourierTransformOf(data):
+    f_ishift = np.fft.ifftshift(data)
+    img_back = cv2.idft(f_ishift)
+    img_back = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+    return img_back
+
+def __NP_invertFourierTransformOf(data):
+    f_ishift = np.fft.ifftshift(data)
+    img_back = np.fft.ifft2(f_ishift)
+    img_back = np.abs(img_back)
+    return img_back
+
+#this method fixes the image to best size for improve performance of fourier transform
+def __fixImgToFTBestSize(image):
+    # get best size
+    rows = image.shape[0]
+    columns = image.shape[1]
+    nrows = cv2.getOptimalDFTSize(rows)
+    ncols = cv2.getOptimalDFTSize(columns)
+    right = ncols - columns
+    bottom = nrows - rows
+    nimg = cv2.copyMakeBorder(image, 0, bottom, 0, right, cv2.BORDER_CONSTANT, value=0)
+    return nimg
+
 
 def segmentIrisOnImageAtPath(path):
+    # type: (object) -> object
 
     eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     copyImage = eyeImage.copy()
@@ -722,19 +837,36 @@ def segmentIrisOnImageAtPath(path):
 
         #irisData = __normalizeIrisRegion(eyeImage, pupilCircle, irisCircle, 6)
         #showImage(irisData, "Normalized iris data")
-        irisData = __RSM_NormIrisRegion(eyeImage, pupilCircle, irisCircle,50,3)
+        irisData = __RSM_NormIrisRegion(eyeImage, pupilCircle, irisCircle,40,3)
         showImage(irisData, "Rubber Sheet Model Normalized iris data")
 
+        #irisCode = __2DLogGaborFilter(irisData.shape[0],irisData.shape[1])*irisData
 
         #irisCode = __codificateIrisData(irisData)
 
-        #showImage(irisCode, "Codificated Iris data")
-
-
+        #showImage(irisCode.astype(np.uint8), "Codificated Iris data")
 
     except Exception, e:
         print e
 
+def fourierTransform(imagePath):
+    image = cv2.imread(imagePath,cv2.IMREAD_GRAYSCALE)
+    #nimage = __fixImgToFTBestSize(image)
+    #showImage(nimage,"resized image")
+    imgFT = __CV2_fourierTransformOf(image)
+    #imgFT = __NP_fourierTransformOf(image)
+
+    rows = imgFT.shape[0]
+    cols = imgFT.shape[1]
+
+    #gFilter = __2DLogGaborFilter(rows,cols)
+
+    #filtered = imgFT*gFilter
+
+    img = __CV2_invertFourierTransformOf(imgFT)
+    #img = __NP_invertFourierTransformOf(imgFT)
+    #showImage(img.astype(np.uint8),"After Filter")
+    showImage(img,"After Filter")
 
 
 

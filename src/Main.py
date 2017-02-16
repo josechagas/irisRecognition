@@ -200,7 +200,10 @@ def main():
     ###### Pupil
     #pupilV3()
     ###### Iris
-    iris()
+    #iris()
+
+    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/fft.jpg")
 
     #dIrisP.executeOpForImage("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
 
