@@ -713,7 +713,7 @@ def segmentIrisOnImage(eyeImage):
         print e
 
 #tutorial = http://www.peterkovesi.com/matlabfns/PhaseCongruency/Docs/convexpl.html
-def __2DLogGaborFilter(lins,cols):
+def __2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
     #radius matrix
     #populate the radius matrix
     x = -(cols/2.0)
@@ -731,9 +731,9 @@ def __2DLogGaborFilter(lins,cols):
 
 
     ################################# radial part of filter
-    waveLenght = 5.0#10.0# at least 2 #######
+    #waveLenght = 3.0#10.0# at least 2 #######
     f0 = 1.0/waveLenght
-    sigmaOnf = 0.55#0.75 ########
+    #sigmaOnf = 0.55#0.75 ########
     gaborRadial = np.zeros((lins, cols))
     for lin in range(0,lins):
         lineLog = np.zeros(cols)
@@ -796,13 +796,13 @@ def __CV2_fourierTransformOf(image,showProcess=False):
 def __CV2_invertFourierTransformOf(data):
     f_ishift = np.fft.ifftshift(data)
     img_back = cv2.idft(f_ishift)
-    img_back = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+    img_mag = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
     return img_back
 
 def __NP_invertFourierTransformOf(data):
     f_ishift = np.fft.ifftshift(data)
     img_back = np.fft.ifft2(f_ishift)
-    img_back = np.abs(img_back)
+    img_mag = np.abs(img_back)
     return img_back
 
 #this method fixes the image to best size for improve performance of fourier transform
@@ -817,6 +817,17 @@ def __fixImgToFTBestSize(image):
     nimg = cv2.copyMakeBorder(image, 0, bottom, 0, right, cv2.BORDER_CONSTANT, value=0)
     return nimg
 
+def __extractCharacteristics(filteredIrisData):
+    rows = filteredIrisData.shape[0]
+    cols = filteredIrisData.shape[1]
+    irisCode = np.zeros(rows, cols, 2)
+    for row in range(0, rows):
+        lineCode = np.zeros(1,cols,2)
+        for col in range(0, cols):
+            print "foi"
+
+
+    return irisCode
 
 def segmentIrisOnImageAtPath(path):
     # type: (object) -> object
@@ -849,30 +860,52 @@ def segmentIrisOnImageAtPath(path):
     except Exception, e:
         print e
 
-def fourierTransform(imagePath):
-    image = cv2.imread(imagePath,cv2.IMREAD_GRAYSCALE)
+def codificateIris(path):
+    image = cv2.imread(path,cv2.IMREAD_GRAYSCALE)
     #nimage = __fixImgToFTBestSize(image)
     #showImage(nimage,"resized image")
-    imgFT = __CV2_fourierTransformOf(image)
-    #imgFT = __NP_fourierTransformOf(image)
+    #imgFT = __CV2_fourierTransformOf(image)
+    pupilCircle = __pupilCircleOnImageV2(image, True)
+    irisCircle = __irisCircleOnImageV1(image, pupilCircle, True)
+    irisData = __RSM_NormIrisRegion(image, pupilCircle, irisCircle, 40, 3)
+    showImage(irisData, "Rubber Sheet Model Normalized iris data")
+
+    imgFT = __NP_fourierTransformOf(irisData)
 
     rows = imgFT.shape[0]
     cols = imgFT.shape[1]
 
-    #gFilter = __2DLogGaborFilter(rows,cols)
+    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
 
-    #filtered = imgFT*gFilter
+    filtered = imgFT*gFilter
 
-    img = __CV2_invertFourierTransformOf(imgFT)
+    #img = __CV2_invertFourierTransformOf(imgFT)
     #img = __NP_invertFourierTransformOf(imgFT)
-    #showImage(img.astype(np.uint8),"After Filter")
-    showImage(img,"After Filter")
+    img = __NP_invertFourierTransformOf(filtered)
+    showImage(img.astype(np.uint8),"After Filter")
+
+    __extractCharacteristics(img)
 
 
+def fourierTransform(imagePath):
+    image = cv2.imread(imagePath,cv2.IMREAD_GRAYSCALE)
+    #nimage = __fixImgToFTBestSize(image)
+    #showImage(nimage,"resized image")
 
+    #imgFT = __CV2_fourierTransformOf(image)
+    imgFT = __NP_fourierTransformOf(image)
 
+    rows = imgFT.shape[0]
+    cols = imgFT.shape[1]
 
+    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
 
+    filtered = imgFT*gFilter
 
+    #img = __CV2_invertFourierTransformOf(imgFT)
+    #img = __NP_invertFourierTransformOf(imgFT)
+    img = __NP_invertFourierTransformOf(filtered)
+    showImage(img.astype(np.uint8),"After Filter")
+    #showImage(img,"After Filter")
 
 
