@@ -1,5 +1,4 @@
 import IrisProcessing as irisP
-import DaugmanIrisProcessing as dIrisP
 
 def pupilV1():
 ###### Pupil
@@ -202,8 +201,12 @@ def main():
     ###### Iris
     #iris()
     #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-    irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/fft.jpg")
+    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/fft.jpg")
     #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/normTestImage.png")
+
+    irisP.codificateIris("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+    # irisP.codificateIris("/Users/joseLucas/Desktop/Python Projects/Images/normTestImage.png")
+
 
     #dIrisP.executeOpForImage("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
 

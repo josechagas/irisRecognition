@@ -3,25 +3,6 @@ import cv2
 import math
 #import scipy.integrate as integrate
 
-def captureVideoFromCamera():
-    cap = cv2.VideoCapture(0)
-
-    while (True):
-        # Capture frame-by-frame
-        ret, frame = cap.read()
-
-        # Our operations on thqe frame come here
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        tryToShowPupil(gray)
-        # Display the resulting frame
-        cv2.imshow('frame', gray)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # When everything done, release the capture
-    cap.release()
-    cv2.destroyAllWindows()
-
 #this method presents the image with some title
 #image = choosed image
 #title = title for choosed image
@@ -117,84 +98,8 @@ def __pixelsOfCircle(image,circle,showProcess=False):
     if showProcess: showImage(circleData,"Pixels on Circle")
     return circleData
 
-#This method calculates and returns the corresponding point of circle on its border for some angle
-def __pointOfCircle(circle,angle):
-    rads = angle * math.pi / 180
-    cosValue = math.cos(rads)
-    sinValue = math.sin(rads)
-    x = int(circle[0] + circle[2] * cosValue)
-    y = int(circle[1] + circle[2] * sinValue)
-    return [x,y]
+#-------------------- Iris and pupil localization
 
-#This method extracts the iris information
-#pupilRadioOffset this value indicates how many pixels you want to increment on pupil radio to avoid the possibility
-#to appear some pupil pixels
-#The size of normalized image depends of irisRadio - pupilRadio, that can change because of pupil dilation for example
-def __normalizeIrisRegion(eyeImage,pupilCircle,irisCircle,pupilRadioOffset=0):
-    lins = int(irisCircle[2] - pupilCircle[2] - pupilRadioOffset)  # int(irisCircle[2] - pupilCircle[2])
-    cols = 360#int((irisCircle[2] - pupilCircle[2]) + 2)
-    irisData = np.zeros((lins, cols), np.uint8)
-
-    xDif = irisCircle[0] - pupilCircle[0]
-    yDif = irisCircle[1] - pupilCircle[1]
-
-    for ri in range(int(pupilCircle[2] + pupilRadioOffset),irisCircle[2]):
-        line = np.zeros(360, np.uint8)
-        for angle in range(0,cols):
-            cosValue = math.cos(angle*math.pi/180)
-            sinValue = math.sin(angle * math.pi / 180)
-            x = int(irisCircle[0] + (ri - xDif*cosValue)*cosValue)
-            y = int(irisCircle[1] + (ri - yDif*sinValue) * sinValue)
-            line[angle] = eyeImage[y][x]
-        irisData[int(ri - pupilCircle[2] - pupilRadioOffset)] = line
-
-    return irisData
-
-#Rubber Sheet Model
-# this method normalize the iris region using the same method of Daugman, so the normalized image
-#always has the same dimensions fixing some problems like pupil dilation and other thing that might cause
-#changes on normalized iris region image size
-def __RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset=0):
-    numbOfCols = 360
-    irisData = np.zeros((numbOfLins, numbOfCols), np.uint8)
-    for p in np.arange(0.0, 1.0, 1.0 / numbOfLins):
-        line = np.zeros(numbOfCols, np.uint8)
-        for angle in range(0,360,360/numbOfCols):
-            pupilPoint = __pointOfCircle([pupilCircle[0],pupilCircle[1],pupilCircle[2]+pupilOffset],angle)
-            irisPoint = __pointOfCircle(irisCircle,angle)
-            xo = int((1-p)*pupilPoint[0] + p*irisPoint[0])
-            yo = int((1-p)*pupilPoint[1] + p*irisPoint[1])
-            line[angle] = eyeImage[yo][xo]
-        irisData[int(p*numbOfLins)] = line
-    return irisData
-
-def __codificateIrisData(irisData):
-    cols = irisData.shape[1]
-    lines = irisData.shape[0]
-    #irisCode = np.zeros((lines, cols), np.uint8)
-    irisCode = np.zeros((lines, cols))
-
-    for y in range(0,lines):
-        #line = np.zeros(cols, np.uint8)
-        line = np.zeros(cols)
-        for x in range(0,cols):
-            xRads = x*math.pi/180
-            pixelValue = irisData[y][x]
-            #f0 = irisData[y][0]
-            #q = f0 + 10
-            #gaborValue = math.exp(-((math.log10(pixelValue/f0))**2)/2*(math.log10(q/f0))**2)
-            #line[x] = gaborValue
-            w0 = 0.1
-            qw = 0.55
-            radialPart = math.exp(-((math.log10(pixelValue/w0))**2)/(2*(math.log10(qw))**2))
-
-            d0 = 0
-            qd = math.pi / 8
-            anglePart = math.exp(-((xRads - d0)**2)/(2*(qd)**2))
-            gaborValue = radialPart*anglePart
-            line[x] = gaborValue
-        irisCode[y] = line
-    irisCode
 
 #This method try to find iris outer countorn
 #eyeImage must have the pupil paited of black
@@ -578,7 +483,6 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
             return circle
     return objCircles
 
-
 #this is for picamera
 def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
     width = eyeImage.shape[1]
@@ -655,9 +559,6 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
             return circle
     return objCircles
 
-
-
-
 #The image must be on gray scale
 #tenta encontrar a linha formada pelas palpebras
 def __eyelidsLines(eyeImage,showProcess):
@@ -671,9 +572,7 @@ def __eyelidsLines(eyeImage,showProcess):
     return lines
 
 
-
-
-#-------------
+#-------------------- Test methods
 
 
 #Finds the pupil on a image and draws a circle on a image presenting the pupil
@@ -697,137 +596,7 @@ def showEyeLidsOnImageAtPath(path):
     except Exception, e:
         print e
 
-def segmentIrisOnImage(eyeImage):
 
-    copyImage = cv2.cvtColor(eyeImage, cv2.COLOR_BGR2GRAY)
-    #cv2.cvtColor(eyeImage,cv2.COLOR_BAYER_BG2GRAY)#eyeImage.copy()
-    try:
-        pupilCircle = __pupilCircleOnImageV2(copyImage,True)
-
-        irisCircle = __irisCircleOnImageV1(copyImage,pupilCircle,True)
-        drawCirclesOnImage(copyImage,[irisCircle])
-        showImage(copyImage,"Circles for Iris found on Iris Image")
-
-
-    except Exception, e:
-        print e
-
-#tutorial = http://www.peterkovesi.com/matlabfns/PhaseCongruency/Docs/convexpl.html
-def __2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
-    #radius matrix
-    #populate the radius matrix
-    x = -(cols/2.0)
-    y = -(lins/2.0)
-    radius = np.zeros((lins, cols))
-    for lin in range(0,lins):
-        yLin = (y + lin)/lins
-        line = np.zeros(cols)
-        for col in range(0,cols):
-            xCol = (x + col)/cols
-            line[col] = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
-        radius[lin] = line
-    radius[lins/2][cols/2] = 1
-    #return radius
-
-
-    ################################# radial part of filter
-    #waveLenght = 3.0#10.0# at least 2 #######
-    f0 = 1.0/waveLenght
-    #sigmaOnf = 0.55#0.75 ########
-    gaborRadial = np.zeros((lins, cols))
-    for lin in range(0,lins):
-        lineLog = np.zeros(cols)
-        for col in range(0,cols):
-            f = radius[lin][col]
-            radialPart = math.exp(-((math.log10(f / f0)) ** 2) / (2 * (math.log10(sigmaOnf)) ** 2))
-            lineLog[col] = radialPart
-        gaborRadial[lin] = lineLog
-    gaborRadial[lins/2][cols/2] = 0
-    #return gaborRadial
-
-    #new = cv2.normalize(gaborRadial,0,1,cv2.NORM_MINMAX)
-    #showImage(new,"read")
-
-    ################################## angular part of filter
-    spread = np.zeros((lins, cols))
-    thetaSigma = 1.5 ######
-    for lin in range(0,lins):
-        yLin = (y + lin)/lins
-        spreadLine = np.zeros(cols)
-        for col in range(0,cols):
-            xCol = (x + col)/cols
-            theta = math.atan2(-yLin,xCol)
-            sinTheta = math.sin(theta)
-            cosTheta = math.cos(theta)
-
-            angl = col*math.pi/180
-            ds = sinTheta*math.cos(angl) - cosTheta*math.sin(angl)
-            dc = cosTheta*math.cos(angl) + sinTheta*math.sin(angl)
-            dTheta = abs(math.atan2(ds,dc))
-
-            anglePart = math.exp(-(dTheta**2)/(2*(thetaSigma)**2))
-            spreadLine[col] = anglePart
-        spread[lin] = spreadLine
-
-    #return spread
-
-    filter = spread*gaborRadial
-    return filter
-
-#http://docs.opencv.org/3.1.0/de/dbc/tutorial_py_fourier_transform.html
-#using numpy
-def __NP_fourierTransformOf(image,showProcess=False):
-    showImage(image,"Image")
-    f = np.fft.fft2(image)
-    fshift = np.fft.fftshift(f)
-    magnitude_spectrum = 20 * np.log(np.abs(fshift))
-    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
-    return fshift
-
-#using cv2
-#teorically faster
-def __CV2_fourierTransformOf(image,showProcess=False):
-    dft = cv2.dft(np.float32(image), flags=cv2.DFT_COMPLEX_OUTPUT)
-    dft_shift = np.fft.fftshift(dft)
-    magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
-    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
-    return dft_shift
-
-def __CV2_invertFourierTransformOf(data):
-    f_ishift = np.fft.ifftshift(data)
-    img_back = cv2.idft(f_ishift)
-    img_mag = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
-    return img_back
-
-def __NP_invertFourierTransformOf(data):
-    f_ishift = np.fft.ifftshift(data)
-    img_back = np.fft.ifft2(f_ishift)
-    img_mag = np.abs(img_back)
-    return img_back
-
-#this method fixes the image to best size for improve performance of fourier transform
-def __fixImgToFTBestSize(image):
-    # get best size
-    rows = image.shape[0]
-    columns = image.shape[1]
-    nrows = cv2.getOptimalDFTSize(rows)
-    ncols = cv2.getOptimalDFTSize(columns)
-    right = ncols - columns
-    bottom = nrows - rows
-    nimg = cv2.copyMakeBorder(image, 0, bottom, 0, right, cv2.BORDER_CONSTANT, value=0)
-    return nimg
-
-def __extractCharacteristics(filteredIrisData):
-    rows = filteredIrisData.shape[0]
-    cols = filteredIrisData.shape[1]
-    irisCode = np.zeros(rows, cols, 2)
-    for row in range(0, rows):
-        lineCode = np.zeros(1,cols,2)
-        for col in range(0, cols):
-            print "foi"
-
-
-    return irisCode
 
 def segmentIrisOnImageAtPath(path):
     # type: (object) -> object
@@ -870,22 +639,7 @@ def codificateIris(path):
     irisData = __RSM_NormIrisRegion(image, pupilCircle, irisCircle, 40, 3)
     showImage(irisData, "Rubber Sheet Model Normalized iris data")
 
-    imgFT = __NP_fourierTransformOf(irisData)
-
-    rows = imgFT.shape[0]
-    cols = imgFT.shape[1]
-
-    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
-
-    filtered = imgFT*gFilter
-
-    #img = __CV2_invertFourierTransformOf(imgFT)
-    #img = __NP_invertFourierTransformOf(imgFT)
-    img = __NP_invertFourierTransformOf(filtered)
-    showImage(img.astype(np.uint8),"After Filter")
-
-    __extractCharacteristics(img)
-
+    __codificateIrisData(irisData,True)
 
 def fourierTransform(imagePath):
     image = cv2.imread(imagePath,cv2.IMREAD_GRAYSCALE)
