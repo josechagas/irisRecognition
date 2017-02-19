@@ -596,70 +596,49 @@ def showEyeLidsOnImageAtPath(path):
     except Exception, e:
         print e
 
-
-
-def segmentIrisOnImageAtPath(path):
-    # type: (object) -> object
-
-    eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    copyImage = eyeImage.copy()
+#Tries to find the pupil location on a image and returns it
+def findPupilInImage(image,showProcess=False):
     try:
-        pupilCircle = __pupilCircleOnImageV2(copyImage,True)
-        irisCircle = __irisCircleOnImageV1(copyImage,pupilCircle,True)
-        #image = __extractIrisData(eyeImage,pupilCircle,irisCircle)
-        #showImage(image,"test")
-
-        #pupilCircle = __pupilCircleOnImageRaspCam(copyImage,True)
-        #irisCircle = __irisCircleOnImageRaspCam(copyImage,pupilCircle,True)
-
-        drawCirclesOnImage(copyImage,[irisCircle])
-        showImage(copyImage,"Circles for Iris found on Iris Image")
-
-        #irisData = __normalizeIrisRegion(eyeImage, pupilCircle, irisCircle, 6)
-        #showImage(irisData, "Normalized iris data")
-        irisData = __RSM_NormIrisRegion(eyeImage, pupilCircle, irisCircle,40,3)
-        showImage(irisData, "Rubber Sheet Model Normalized iris data")
-
-        #irisCode = __2DLogGaborFilter(irisData.shape[0],irisData.shape[1])*irisData
-
-        #irisCode = __codificateIrisData(irisData)
-
-        #showImage(irisCode.astype(np.uint8), "Codificated Iris data")
-
+        pupilCircle = __pupilCircleOnImageV2(image, showProcess)
+        if showProcess:
+            copy = image.copy()
+            drawCirclesOnImage(copy, [pupilCircle])
+            showImage(copy, "Location of pupil")
+        return pupilCircle
     except Exception, e:
         print e
 
-def codificateIris(path):
-    image = cv2.imread(path,cv2.IMREAD_GRAYSCALE)
-    #nimage = __fixImgToFTBestSize(image)
-    #showImage(nimage,"resized image")
-    #imgFT = __CV2_fourierTransformOf(image)
-    pupilCircle = __pupilCircleOnImageV2(image, True)
-    irisCircle = __irisCircleOnImageV1(image, pupilCircle, True)
-    irisData = __RSM_NormIrisRegion(image, pupilCircle, irisCircle, 40, 3)
-    showImage(irisData, "Rubber Sheet Model Normalized iris data")
-
-    __codificateIrisData(irisData,True)
-
-def fourierTransform(imagePath):
-    image = cv2.imread(imagePath,cv2.IMREAD_GRAYSCALE)
-    #nimage = __fixImgToFTBestSize(image)
-    #showImage(nimage,"resized image")
-
-    #imgFT = __CV2_fourierTransformOf(image)
-    imgFT = __NP_fourierTransformOf(image)
-
-    rows = imgFT.shape[0]
-    cols = imgFT.shape[1]
-
-    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
-
-    filtered = imgFT*gFilter
-
-    #img = __CV2_invertFourierTransformOf(imgFT)
-    #img = __NP_invertFourierTransformOf(imgFT)
-    img = __NP_invertFourierTransformOf(filtered)
-    showImage(img.astype(np.uint8),"After Filter")
-    #showImage(img,"After Filter")
+# Tries to find the pupil location on a image and returns it
+def findPupilInImageAtPath(path, showProcess=False):
+    image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    try:
+        pupilCircle = __pupilCircleOnImageV2(image, showProcess)
+        if showProcess:
+            copy = image.copy()
+            drawCirclesOnImage(copy, [pupilCircle])
+            showImage(copy, "Location of pupil")
+        return pupilCircle
+    except Exception, e:
+        print e
 
 
+#This image has the pupil region blacked
+def findIrisInImage(image,pupilCircle,showProcess=False):
+
+    irisCircle = __irisCircleOnImageV1(image,pupilCircle,showProcess)
+    if showProcess:
+        copy = image.copy()
+        drawCirclesOnImage(copy, [irisCircle])
+        showImage(copy, "Location of Iris")
+    return irisCircle
+
+def findIrisInImageAtPath(path,pupilCircle,showProcess=False):
+
+    image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+
+    irisCircle = __irisCircleOnImageV1(image,pupilCircle,showProcess)
+    if showProcess:
+        copy = image.copy()
+        drawCirclesOnImage(copy, [irisCircle])
+        showImage(copy, "Location of Iris")
+    return irisCircle

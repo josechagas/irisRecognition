@@ -157,6 +157,7 @@ def codificateIrisData(irisData,showProcess=False):
 #pupilOffset =increment on pupilCenter ray to avoid for example getting some pupil information
 #showProcess=Present or not some steps of process as images
 def codificateIrisData(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset=0,showProcess=False):
+
     irisData = RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins,pupilOffset)
     if showProcess: showImage(irisData,"Normalized iris region")
 
