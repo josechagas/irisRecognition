@@ -98,7 +98,7 @@ def __pixelsOfCircle(image,circle,showProcess=False):
     if showProcess: showImage(circleData,"Pixels on Circle")
     return circleData
 
-#-------------------- Iris and pupil localization
+#-------------------- Find Iris methods
 
 
 #This method try to find iris outer countorn
@@ -267,6 +267,11 @@ def __irisCircleOnImageRaspCam(eyeImage,pupilCircle,showProcess=False):
     return np.array([bestIrisCircle[0] + xInitial,bestIrisCircle[1] + yInitial,bestIrisCircle[2]],np.float32)
 
     #return [pupilCircle[0],pupilCircle[1],bestIrisCircle[2]]#fixing some deviation on center
+
+
+#-------------------------------------------------------------------
+
+#-------------------- Find pupil methods
 
 #This method tries to find the region that corresponds to pupil
 def __pupilCircleOnImage(eyeImage,showProcess):
@@ -559,6 +564,10 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
             return circle
     return objCircles
 
+#-------------------------------------------------------------------
+
+#-------------------- Find Eyelids methods
+
 #The image must be on gray scale
 #tenta encontrar a linha formada pelas palpebras
 def __eyelidsLines(eyeImage,showProcess):
@@ -568,31 +577,20 @@ def __eyelidsLines(eyeImage,showProcess):
     lines = cv2.HoughLines(cannyImage,1,np.pi/180,1)
     if lines is None:
         raise Exception("No Lines of eyelids where found")
-    print   "encontrou" + str(lines.__len__()) + " linhas"
+    print   "encontrou " + str(lines.__len__()) + " linhas"
     return lines
 
+#-------------------- Public methods
 
-#-------------------- Test methods
-
-
-#Finds the pupil on a image and draws a circle on a image presenting the pupil
-def tryToShowPupil(path):
-    eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+def findEyelidsInImage(eyeImage,showProcess=False):
     try:
-        pupilCircle = __pupilCircleOnImageV2(eyeImage, True)
-        drawCirclesOnImage(eyeImage,[pupilCircle])
-        showImage(eyeImage,"Circles found on Iris Image")
-    except Exception, e:
-        print e
 
-
-def showEyeLidsOnImageAtPath(path):
-    eyeImage = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    showImage(eyeImage,"Original Image")
-    try:
-        lines = __eyelidsLines(eyeImage, True)
-        drawLinesOnImage(eyeImage,lines)
-        showImage(eyeImage, "Detected Lines of eyelids")
+        lines = __eyelidsLines(eyeImage, showProcess)
+        if showProcess:
+            copy = eyeImage.copy()
+            drawLinesOnImage(copy, lines)
+            showImage(copy, "Detected Lines of eyelids")
+        return lines
     except Exception, e:
         print e
 
@@ -642,3 +640,44 @@ def findIrisInImageAtPath(path,pupilCircle,showProcess=False):
         drawCirclesOnImage(copy, [irisCircle])
         showImage(copy, "Location of Iris")
     return irisCircle
+
+
+def segmentationOfIris(eyeImage,showProcess=False):
+    #processedImage = cv2.equalizeHist(eyeImage)
+
+    #if showProcess:  showImage(equalized, "After Histogram Equalization")
+
+    #processedImage = cv2.Canny(equalized, 40, 40,3)
+
+    #if showProcess:  showImage(processedImage, "After Apply Canny")
+
+    #processedImage = cv2.medianBlur(eyeImage, 11)
+
+    #processedImage = cv2.bilateralFilter(processedImage, 30, 10, 100, 25)
+    #processedImage = cv2.medianBlur(eyeImage, 11)
+    #processedImage = cv2.GaussianBlur(eyeImage, (9,9), 3, 3)  # change on 1_5
+
+    processedImage = cv2.medianBlur(eyeImage,11)
+    processedImage = cv2.bilateralFilter(processedImage, 30, 10, 100, 25)
+    if showProcess:  showImage(processedImage, "After Apply Bilateral filter")
+    processedImage = cv2.Canny(processedImage, 10, 100,3)
+
+    if showProcess:  showImage(processedImage, "After Apply Canny")
+
+    width = eyeImage.shape[1]
+    height = eyeImage.shape[0]
+    center = (width / 2, height / 2)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,151) #near eyeimage
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 4, 30,150)
+
+    if objCircles is None:
+        print "nenhum circulo encontrado"
+    elif objCircles.__len__() > 0:
+        circles = objCircles[0]
+        if circles.__len__() > 0:
+            circle = circles[0]
+            copiedImage = eyeImage.copy()
+            drawCirclesOnImage(copiedImage, circles, False)
+            showImage(copiedImage, "Found these ones")
+            return circle
+    return objCircles

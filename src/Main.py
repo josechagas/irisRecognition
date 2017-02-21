@@ -100,7 +100,7 @@ def iris():
 ##### Iris
 ## Picamera
 
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
+    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
@@ -114,7 +114,7 @@ def iris():
 
 #Initial
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
+#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
@@ -152,58 +152,60 @@ def iris():
 
 
 
-# def eyelids():
-# ##### Iris
+def eyelids():
+##### Iris
+
+#Initial
+    testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R03.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R04.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R05.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R06.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L06.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R07.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L07.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L08.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R08.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L09.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R09.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R10.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L10.jpg")
 #
-# #Initial
-#      irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R03.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R04.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R05.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R06.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L06.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R07.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L07.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L08.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R08.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L09.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R09.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R10.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L10.jpg")
-# #
-# # #others
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/7.jpg")#not working
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/8.jpg")#not working
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/9.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/10.jpg")#not working
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/11.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
-# #     irisP.showEyeLidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
-#
+# #others
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/7.jpg")#not working
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/8.jpg")#not working
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/9.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/10.jpg")#not working
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/11.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
+#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
+
 
 
 def validateImageAtPah(path):
 
     image = imread(path, IMREAD_GRAYSCALE)
-    pupilCircle = irisP.findPupilInImage(image,True)
-    blackedPupilImage = irisP.drawCirclesOnImage(image.copy(),[pupilCircle],True)
-    irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
-    #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
+    # pupilCircle = irisP.findPupilInImage(image,True)
+    # blackedPupilImage = irisP.drawCirclesOnImage(image.copy(),[pupilCircle],True)
+    # irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
+    # #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
+    # code = dataCod.codificateIrisData(image,pupilCircle,irisCircle,40,0,True)
 
-    code = dataCod.codificateIrisData(image,pupilCircle,irisCircle,40,0,True)
+    irisP.showImage(image,"Original Image")
+    irisP.segmentationOfIris(image,True)
 
     return True
 
@@ -231,6 +233,9 @@ def testIndependencyOf(codeA,maskA,codeB,maskB):
                 hd += (operator.xor(a,b) & ma & mb)/(ma & mb)
     return hd/10000.0
 
+
+
+#--------------------------Test methods
 import numpy as np
 def testValidation():
     imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
@@ -251,6 +256,22 @@ def testValidation():
 
     value = testIndependencyOf(codeA,maskA,codeB,maskB)
 
+def testFindEyelidsOnImageAtPath(path):
+    image = imread(path, IMREAD_GRAYSCALE)
+    irisP.showImage(image,"Original Image")
+    irisP.findEyelidsInImage(image,True)
+
+def testUsageOfFourier():
+
+    #imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
+    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg", IMREAD_GRAYSCALE)
+
+    value = dataCod.CV2_fourierTransformOf(imageA, True)
+
+    data = dataCod.CV2_invertFourierTransformOf(value)
+
+#-------------------------
+
 def main():
     print "ola"
 
@@ -258,17 +279,12 @@ def main():
     ###### Pupil
     #pupilV3()
     ###### Iris
-    #iris()
-    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/fft.jpg")
-    #irisP.fourierTransform("/Users/joseLucas/Desktop/Python Projects/Images/normTestImage.png")
+    iris()
+    #eyelids()
 
-    #irisP.codificateIris("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-    # irisP.codificateIris("/Users/joseLucas/Desktop/Python Projects/Images/normTestImage.png")
-
-
-    #dIrisP.executeOpForImage("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-
-
-    testValidation()
+    #testUsageOfFourier()
+    #testValidation()
 main()
+
+
+

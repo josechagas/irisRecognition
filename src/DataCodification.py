@@ -80,7 +80,7 @@ def __NP_fourierTransformOf(image,showProcess=False):
 #using cv2
 #teorically faster
 #fourier transform using opencv methods
-def __CV2_fourierTransformOf(image,showProcess=False):
+def CV2_fourierTransformOf(image,showProcess=False):
     dft = cv2.dft(np.float32(image), flags=cv2.DFT_COMPLEX_OUTPUT)
     dft_shift = np.fft.fftshift(dft)
     magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
@@ -88,10 +88,11 @@ def __CV2_fourierTransformOf(image,showProcess=False):
     return dft_shift
 
 #invert fourier transform using opencv methods
-def __CV2_invertFourierTransformOf(data):
+def CV2_invertFourierTransformOf(data):
     f_ishift = np.fft.ifftshift(data)
     img_back = cv2.idft(f_ishift)
     img_mag = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+    showImage(img_mag.astype(np.uint8),"mag")
     return img_back
 
 #invert fourier transform using numpy methods
