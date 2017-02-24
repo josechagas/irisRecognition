@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import math
-#import scipy.integrate as integrate
 
 #this method presents the image with some title
 #image = choosed image
@@ -641,6 +640,8 @@ def findIrisInImageAtPath(path,pupilCircle,showProcess=False):
         showImage(copy, "Location of Iris")
     return irisCircle
 
+
+#----------------------------------Dev methods
 
 def segmentationOfIris(eyeImage,showProcess=False):
     #processedImage = cv2.equalizeHist(eyeImage)

@@ -119,16 +119,38 @@ def __extractCharacteristics(filteredIrisData):
     rows = filteredIrisData.shape[0]
     cols = filteredIrisData.shape[1]
     irisCode = np.zeros((rows, cols,2),np.uint8)
+
+    # old way (working)
+    # for row in range(0, rows):
+    #     lineCode = np.zeros((cols,2),np.uint8)
+    #     for col in range(0, cols):
+    #         complexValue = filteredIrisData[row][col]
+    #         hRE = 1
+    #         if complexValue.real < 0 : hRE = 0
+    #         hIM = 1
+    #         if complexValue.imag < 0: hIM = 0
+    #         lineCode[col] = [hRE,hIM]
+    #     irisCode[row] = lineCode
+
+    #improved way
     for row in range(0, rows):
         lineCode = np.zeros((cols,2),np.uint8)
-        for col in range(0, cols):
-            print "foi"
+        for col in range(0, cols/2):
             complexValue = filteredIrisData[row][col]
             hRE = 1
             if complexValue.real < 0 : hRE = 0
             hIM = 1
             if complexValue.imag < 0: hIM = 0
             lineCode[col] = [hRE,hIM]
+
+            delta = (cols / 2) + col
+            complexValue = filteredIrisData[row][delta]
+            hRE = 1
+            if complexValue.real < 0 : hRE = 0
+            hIM = 1
+            if complexValue.imag < 0: hIM = 0
+            lineCode[delta] = [hRE,hIM]
+
         irisCode[row] = lineCode
     return irisCode
 
