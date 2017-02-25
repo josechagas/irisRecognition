@@ -53,7 +53,10 @@ def testIndependencyOf(codeA,maskA,codeB,maskB):
 
 
 
-
+#Esse metodo fara a verificacao se a imagem capturada e uma imagem de iris valida ou nao
+#Apos gerar o codigo e mascara da imagem capturada esse metodo lera todos os arquivos com iris salvas comparando-as usando
+#o metodo testIndependencyOf
+#Esse metodo tem como output true ou false para indicar se e uma iris valida ou nao
 def isItAValidIrisImage(irisImage):
 
     data = codAndMaskOfIrisImage(irisImage)
@@ -62,12 +65,11 @@ def isItAValidIrisImage(irisImage):
     #Remenbar to execute it on more than one thread
     # for each code and mask loaded from server call this methods
     # testIndependencyOf(codeA,maskA,codeB,maskB)
-
-
     return True
 
-
-
+#Esse metodo pega uma imagem de iris e tenta, pois se nao encontrar a iris ou pupila nao sera possivel, gerar o codigo
+# da iris na imagem e sua respectiva mascara
+#Esse metodo retorna uma tupla (codigo, mascara) da imagem passada como parametro
 def codAndMaskOfIrisImage(irisImage):
 
     pupilCircle = irisP.findPupilInImage(irisImage,True)
@@ -76,5 +78,16 @@ def codAndMaskOfIrisImage(irisImage):
     #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
     codeA = dataCod.codificateIrisData(irisImage,pupilCircle,irisCircle,40,0,True)
     maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
-
     return (codeA,maskA)
+
+
+#Esse metodo salva uma nova imagem de iris
+#Primeiramente ele tentara gera o codigo e a mascara para a imagem passada
+#e depois salvara os dados
+#Esse metodo possui como output True ou False para indicar se o processo foi realizado com sucesso ou nao
+def saveIrisOfImage(irisImage):
+    data = codAndMaskOfIrisImage(irisImage)
+
+    #parte de salvar
+
+    return True
