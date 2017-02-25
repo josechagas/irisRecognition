@@ -258,8 +258,9 @@ def __irisCircleOnImageRaspCam(eyeImage,pupilCircle,showProcess=False):
     print int(pupilCircle[2] + 20)
     print bestIrisCircle[2]
 
-    drawCirclesOnImage(blackedPupilEyeImage,[bestIrisCircle])
-    showImage(blackedPupilEyeImage,"asd")
+    if showProcess:
+        drawCirclesOnImage(blackedPupilEyeImage,[bestIrisCircle])
+        showImage(blackedPupilEyeImage,"asd")
 
     #return bestIrisCircle
 
@@ -442,7 +443,7 @@ def __pupilCircleOnImageV2(eyeImage,showProcess=False):
         circles = objCircles[0]
         if circles.__len__() > 0:
             circle = circles[0]
-            if circles.__len__() > 1:
+            if circles.__len__() > 1 and showProcess:
                 print("found "+str(circles.__len__())+" circles")# change on V2
                 copiedImage = eyeImage.copy()
                 drawCirclesOnImage(copiedImage,circles,False)
@@ -479,7 +480,7 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
         circles = objCircles[0]
         if circles.__len__() > 0:
             circle = circles[0]
-            if circles.__len__() > 1:
+            if circles.__len__() > 1 and showProcess:
                 print("found "+str(circles.__len__())+" circles")# change on V2
                 copiedImage = eyeImage.copy()
                 drawCirclesOnImage(copiedImage,circles,False)
@@ -555,7 +556,7 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
         circles = objCircles[0]
         if circles.__len__() > 0:
             circle = circles[0]
-            if circles.__len__() > 1:
+            if circles.__len__() > 1 and showProcess:
                 print("found "+str(circles.__len__())+" circles")# change on V2
                 copiedImage = eyeImage.copy()
                 drawCirclesOnImage(copiedImage,circles,False)

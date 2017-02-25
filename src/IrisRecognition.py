@@ -57,9 +57,9 @@ def testIndependencyOf(codeA,maskA,codeB,maskB):
 #Apos gerar o codigo e mascara da imagem capturada esse metodo lera todos os arquivos com iris salvas comparando-as usando
 #o metodo testIndependencyOf
 #Esse metodo tem como output true ou false para indicar se e uma iris valida ou nao
-def isItAValidIrisImage(irisImage):
+def isItAValidIrisImage(irisImage,showProcess=False):
 
-    data = codAndMaskOfIrisImage(irisImage)
+    data = codAndMaskOfIrisImage(irisImage,showProcess)
 
     #After getting codeA and maskA we need to pass for all saved images and try to find some one that is compatible
     #Remenbar to execute it on more than one thread
@@ -70,13 +70,13 @@ def isItAValidIrisImage(irisImage):
 #Esse metodo pega uma imagem de iris e tenta, pois se nao encontrar a iris ou pupila nao sera possivel, gerar o codigo
 # da iris na imagem e sua respectiva mascara
 #Esse metodo retorna uma tupla (codigo, mascara) da imagem passada como parametro
-def codAndMaskOfIrisImage(irisImage):
+def codAndMaskOfIrisImage(irisImage,showProcess=False):
 
-    pupilCircle = irisP.findPupilInImage(irisImage,True)
-    blackedPupilImage = irisP.drawCirclesOnImage(irisImage.copy(),[pupilCircle],True)
-    irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
+    pupilCircle = irisP.findPupilInImage(irisImage,showProcess)
+    blackedPupilImage = irisP.drawCirclesOnImage(irisImage.copy(),[pupilCircle],showProcess)
+    irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,showProcess)
     #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeA = dataCod.codificateIrisData(irisImage,pupilCircle,irisCircle,40,0,True)
+    codeA = dataCod.codificateIrisData(irisImage,pupilCircle,irisCircle,45,0,showProcess)
     maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
     return (codeA,maskA)
 
@@ -91,3 +91,6 @@ def saveIrisOfImage(irisImage):
     #parte de salvar
 
     return True
+
+
+dataCod.cache2DLGFilter(45)

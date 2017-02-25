@@ -64,17 +64,18 @@ def RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset
         irisData[int(p*numbOfLins)] = line
     return irisData
 
-
+############################# Fourier Transform ####################################
 #tutorial = http://www.peterkovesi.com/matlabfns/PhaseCongruency/Docs/convexpl.html
 
 #http://docs.opencv.org/3.1.0/de/dbc/tutorial_py_fourier_transform.html
 #fourier transform using numpy methods
 def __NP_fourierTransformOf(image,showProcess=False):
-    showImage(image,"Image")
+    if showProcess: showImage(image,"Image")
     f = np.fft.fft2(image)
     fshift = np.fft.fftshift(f)
-    magnitude_spectrum = 20 * np.log(np.abs(fshift))
-    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
+    if showProcess:
+        magnitude_spectrum = 20 * np.log(np.abs(fshift))
+        showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
     return fshift
 
 #using cv2
@@ -83,23 +84,25 @@ def __NP_fourierTransformOf(image,showProcess=False):
 def CV2_fourierTransformOf(image,showProcess=False):
     dft = cv2.dft(np.float32(image), flags=cv2.DFT_COMPLEX_OUTPUT)
     dft_shift = np.fft.fftshift(dft)
-    magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
-    if showProcess : showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
+    if showProcess:
+        magnitude_spectrum = 20 * np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]))
+        showImage(magnitude_spectrum.astype(np.uint8), "Fourier transform")
     return dft_shift
 
 #invert fourier transform using opencv methods
-def CV2_invertFourierTransformOf(data):
+def CV2_invertFourierTransformOf(data,showProcess=False):
     f_ishift = np.fft.ifftshift(data)
     img_back = cv2.idft(f_ishift)
-    img_mag = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
-    showImage(img_mag.astype(np.uint8),"mag")
+    if showProcess:
+        img_mag = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
+        showImage(img_mag.astype(np.uint8),"mag")
     return img_back
 
 #invert fourier transform using numpy methods
 def __NP_invertFourierTransformOf(data):
     f_ishift = np.fft.ifftshift(data)
     img_back = np.fft.ifft2(f_ishift)
-    img_mag = np.abs(img_back)
+    #img_mag = np.abs(img_back)
     return img_back
 
 #this method fixes the image to best size for improve performance of fourier transform
@@ -114,7 +117,9 @@ def __fixImgToFTBestSize(image):
     nimg = cv2.copyMakeBorder(image, 0, bottom, 0, right, cv2.BORDER_CONSTANT, value=0)
     return nimg
 
-#This method apply the last codification process on filtered  normalized image of iris region
+#############################
+
+#This method apply the last codification process on filtered and normalized image of iris region
 def __extractCharacteristics(filteredIrisData):
     rows = filteredIrisData.shape[0]
     cols = filteredIrisData.shape[1]
@@ -163,7 +168,7 @@ def codificateIrisData(irisData,showProcess=False):
     imgFT = __NP_fourierTransformOf(irisData,showProcess)
     rows = imgFT.shape[0]
     cols = imgFT.shape[1]
-    gFilter = _2DLogGaborFilter(rows,cols,4.0,0.65)
+    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
     filtered = imgFT*gFilter
     #img = __CV2_invertFourierTransformOf(imgFT)
     #img = __NP_invertFourierTransformOf(imgFT)
@@ -187,7 +192,7 @@ def codificateIrisData(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset
     imgFT = __NP_fourierTransformOf(irisData,showProcess)
     rows = imgFT.shape[0]
     cols = imgFT.shape[1]
-    gFilter = _2DLogGaborFilter(rows,cols,4.0,0.65)
+    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
     filtered = imgFT*gFilter
     #img = __CV2_invertFourierTransformOf(imgFT)
     #img = __NP_invertFourierTransformOf(imgFT)
@@ -197,50 +202,105 @@ def codificateIrisData(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset
     return __extractCharacteristics(img)
 
 
+def __2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
+    if not hasattr(__2DLogGaborFilter, "cachedFilter"):
+        __2DLogGaborFilter.cachedFilter = __build2DLogGaborFilter(lins, cols, waveLenght, sigmaOnf)
+    return __2DLogGaborFilter.cachedFilter
 
-def _2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
+def __build2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
     #radius matrix
     #populate the radius matrix
     x = -(cols/2.0)
     y = -(lins/2.0)
-    radius = np.zeros((lins, cols))
-    for lin in range(0,lins):
-        yLin = (y + lin)/lins
-        line = np.zeros(cols)
-        for col in range(0,cols):
-            xCol = (x + col)/cols
-            line[col] = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
-        radius[lin] = line
-    radius[lins/2][cols/2] = 1
-    #return radius
 
+    #old way (working)
+    # radius = np.zeros((lins, cols))
+    # for lin in range(0,lins):
+    #     yLin = (y + lin)/lins
+    #     line = np.zeros(cols)
+    #     for col in range(0,cols):
+    #         xCol = (x + col)/cols
+    #         line[col] = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
+    #     radius[lin] = line
+    # radius[lins/2][cols/2] = 1
+    # #return radius
+    #
+    #
+    # ################################# radial part of filter
+    # #waveLenght = 3.0#10.0# at least 2 #######
+    # f0 = 1.0/waveLenght
+    # #sigmaOnf = 0.55#0.75 ########
+    # gaborRadial = np.zeros((lins, cols))
+    # for lin in range(0,lins):
+    #     lineLog = np.zeros(cols)
+    #     for col in range(0,cols):
+    #         f = radius[lin][col]
+    #         radialPart = math.exp(-((math.log10(f / f0)) ** 2) / (2 * (math.log10(sigmaOnf)) ** 2))
+    #         lineLog[col] = radialPart
+    #     gaborRadial[lin] = lineLog
+    # gaborRadial[lins/2][cols/2] = 0
+    # #return gaborRadial
+    #
+    # #new = cv2.normalize(gaborRadial,0,1,cv2.NORM_MINMAX)
+    # #showImage(new,"read")
+    #
+    # ################################## angular part of filter
+    # spread = np.zeros((lins, cols))
+    # thetaSigma = 1.5 ######
+    # for lin in range(0,lins):
+    #     yLin = (y + lin)/lins
+    #     spreadLine = np.zeros(cols)
+    #     for col in range(0,cols):
+    #         xCol = (x + col)/cols
+    #         theta = math.atan2(-yLin,xCol)
+    #         sinTheta = math.sin(theta)
+    #         cosTheta = math.cos(theta)
+    #
+    #         angl = col*math.pi/180
+    #         ds = sinTheta*math.cos(angl) - cosTheta*math.sin(angl)
+    #         dc = cosTheta*math.cos(angl) + sinTheta*math.sin(angl)
+    #         dTheta = abs(math.atan2(ds,dc))
+    #
+    #         anglePart = math.exp(-(dTheta**2)/(2*(thetaSigma)**2))
+    #         spreadLine[col] = anglePart
+    #     spread[lin] = spreadLine
+    #
+    # filter0 = spread * gaborRadial
+    ####
+
+    #new way
 
     ################################# radial part of filter
-    #waveLenght = 3.0#10.0# at least 2 #######
-    f0 = 1.0/waveLenght
-    #sigmaOnf = 0.55#0.75 ########
+    # waveLenght = 3.0#10.0# at least 2 #######
+    f0 = 1.0 / waveLenght
+    # sigmaOnf = 0.55#0.75 ########
     gaborRadial = np.zeros((lins, cols))
-    for lin in range(0,lins):
-        lineLog = np.zeros(cols)
-        for col in range(0,cols):
-            f = radius[lin][col]
-            radialPart = math.exp(-((math.log10(f / f0)) ** 2) / (2 * (math.log10(sigmaOnf)) ** 2))
-            lineLog[col] = radialPart
-        gaborRadial[lin] = lineLog
-    gaborRadial[lins/2][cols/2] = 0
-    #return gaborRadial
-
-    #new = cv2.normalize(gaborRadial,0,1,cv2.NORM_MINMAX)
-    #showImage(new,"read")
+    #################################
 
     ################################## angular part of filter
     spread = np.zeros((lins, cols))
-    thetaSigma = 1.5 ######
+    thetaSigma = 1.5  ######
+    #################################
+
     for lin in range(0,lins):
         yLin = (y + lin)/lins
-        spreadLine = np.zeros(cols)
+
+        lineLog = np.zeros(cols)###radial
+
+        spreadLine = np.zeros(cols)###angular
         for col in range(0,cols):
+
             xCol = (x + col)/cols
+            ################################# radial part of filter
+            f = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
+            if lin == lins/2 and col == cols/2:
+                f = 1
+
+            radialPart = math.exp(-((math.log10(f / f0)) ** 2) / (2 * (math.log10(sigmaOnf)) ** 2))
+            lineLog[col] = radialPart
+            #################################
+
+            ################################## angular part of filter
             theta = math.atan2(-yLin,xCol)
             sinTheta = math.sin(theta)
             cosTheta = math.cos(theta)
@@ -252,9 +312,16 @@ def _2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
 
             anglePart = math.exp(-(dTheta**2)/(2*(thetaSigma)**2))
             spreadLine[col] = anglePart
-        spread[lin] = spreadLine
+            #################################
 
-    #return spread
+        gaborRadial[lin] = lineLog###radial
+        spread[lin] = spreadLine###angular
+
+    gaborRadial[lins/2][cols/2] = 0###radial
 
     filter = spread*gaborRadial
+
     return filter
+
+def cache2DLGFilter(codNumbOfLins=40):
+    __2DLogGaborFilter(codNumbOfLins,360,4.0,0.65)

@@ -253,11 +253,11 @@ def main():
     ###### Pupil
     #pupilV3()
     ###### Iris
-    iris()
+    #iris()
     #eyelids()
 
     #testUsageOfFourier()
-    #testValidation()
+    testValidation()
 main()
 
 
