@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import cv2.cv as cv
 import math
 #import scipy.integrate as integrate
 
@@ -122,7 +121,7 @@ def __irisCircleOnImage(blackedPupilEyeImage,pupilCircle,showProcess):
     bestIrisCircle = None
     while (i < max and bestIrisCircle is None):
         print "tentativa "+str(i - 30)
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
         if i == max - 1:
             print "teste"
         if objCircles is None:
@@ -171,7 +170,7 @@ def __irisCircleOnImageV1(eyeImage,pupilCircle,showProcess=False):
     bestIrisCircle = None
     while (i < max and bestIrisCircle is None):
         print "tentativa "+str(i - 30)
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))
         if i == max - 1:
             print "teste"
         if objCircles is None:
@@ -232,7 +231,7 @@ def __irisCircleOnImageRaspCam(eyeImage,pupilCircle,showProcess=False):
     bestIrisCircle = None
     while (i < max and bestIrisCircle is None):
         print "tentativa "+str(i - 30)
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))#
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, i, pupilCircle[2],int(pupilCircle[2] + 20))#
         if i == max - 1:
             print "teste"
         if objCircles is None:
@@ -295,12 +294,12 @@ def __pupilCircleOnImage(eyeImage,showProcess):
 
     print "primeira tentativa da pupila"
     # HoughCircles(gray, circles, CV_HOUGH_GRADIENT,2, gray->rows/4, 200, 100 );//center[0] / 2
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
-    # objCircles = cv2.HoughCircles(eyeImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
+    # objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
 
     if objCircles is None:
         print "segunda tentativa da pupila"
-        objCircles = cv2.HoughCircles(eyeImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
+        objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
 
     if objCircles is None:
         raise Exception("No Circles were found")
@@ -341,11 +340,11 @@ def __pupilCircleOnImageV1_5(eyeImage,showProcess):
 
 
     print "primeira tentativa da pupila"
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
 
     if objCircles is None:
         print "segunda tentativa da pupila"
-        objCircles = cv2.HoughCircles(eyeImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
+        objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200, 100)
 
     if objCircles is None:
         raise Exception("No Circles were found")
@@ -419,24 +418,24 @@ def __pupilCircleOnImageV2(eyeImage,showProcess=False):
     # processedImage = cv2.Canny(processedImage, lower,upper, 3)#cv2.Canny(processedImage, 40,170, 3)  # cv2.Canny(processedImage, 55, 60,3)#
     # if showProcess: showImage(processedImage, "Canny Iris Image")
 
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
 
     if objCircles is None:
         print "segunda tentativa da pupila"
         processedImage = cv2.bilateralFilter(eyeImage, 30, 50, 100, 25)
         if showProcess: showImage(processedImage, "Bilateral Filtered Iris Image")
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 30,151)
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,151)
 
     if objCircles is None:
         print "terceira tentativa da pupila"
         processedImage = cv2.medianBlur(eyeImage, 11)#11
         if showProcess: showImage(processedImage, "Median Blurred Iris Image")
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
 
     if objCircles is None:
         print "quarta tentativa da pupila"
         if showProcess: showImage(eyeImage, "Original Iris Image")
-        objCircles = cv2.HoughCircles(eyeImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200,200)  # change on 2 works on all initial
+        objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200,200)  # change on 2 works on all initial
 
     if objCircles is None:
         raise Exception("No Circles were found")
@@ -473,7 +472,7 @@ def __pupilCircleOnImageV3(eyeImage,showProcess=False):
     if showProcess:  showImage(processedImage, "After Apply Canny")
 
 
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 150, 60,1,5)
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 150, 60,1,5)
 
     if objCircles is None:
         raise Exception("No Circles were found")
@@ -519,21 +518,21 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
     if showProcess: showImage(processedImage, "Median Blurred Iris Image")
     # processedImage = cv2.Canny(processedImage, 50, 70, 3)
     # if showProcess:  showImage(processedImage, "After Apply Canny")
-    # objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 100, 127, 1,10)
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 100, 9, 1,5)
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 100, 9, 1,5)
+    # objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT,2, center[0] / 2, 30, 151)#change on 2 works on all initial
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 127, 1,10)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 100, 9, 1,5)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 9, 1,5)
 
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 100, 100, 1,5)
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 100, 60, 1,5)
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 150, 60,1,5)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 100, 1,5)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 60, 1,5)
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 150, 60,1,5)
 
     if objCircles is None:
         print "segunda tentativa da pupila"
         #processedImage = cv2.bilateralFilter(eyeImage, 30, 50, 100, 25)
         processedImage = cv2.bilateralFilter(eyeImage, 30, 10, 100, 25)
         if showProcess: showImage(processedImage, "Bilateral Filtered Iris Image")
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, width, 100, 60, 1, 5)
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, width, 100, 60, 1, 5)
 
     if objCircles is None:
         print "terceira tentativa da pupila"
@@ -544,12 +543,12 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
 
         if showProcess: showImage(processedImage, "Gaussian Blurred Iris Image")
 
-        objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 30,
+        objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,
                                       151)  # change on 2 works on all initial
     if objCircles is None:
         print "quarta tentativa da pupila"
         if showProcess: showImage(eyeImage, "Original Iris Image")
-        objCircles = cv2.HoughCircles(eyeImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 200,200)  # change on 2 works on all initial
+        objCircles = cv2.HoughCircles(eyeImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 200,200)  # change on 2 works on all initial
 
     if objCircles is None:
         raise Exception("No Circles were found")
@@ -668,8 +667,8 @@ def segmentationOfIris(eyeImage,showProcess=False):
     width = eyeImage.shape[1]
     height = eyeImage.shape[0]
     center = (width / 2, height / 2)
-    #objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 2, 30,151) #near eyeimage
-    objCircles = cv2.HoughCircles(processedImage, cv.CV_HOUGH_GRADIENT, 2, center[0] / 4, 30,150)
+    #objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 2, 30,151) #near eyeimage
+    objCircles = cv2.HoughCircles(processedImage, cv2.HOUGH_GRADIENT, 2, center[0] / 4, 30,150)
 
     if objCircles is None:
         print "nenhum circulo encontrado"
