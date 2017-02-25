@@ -101,7 +101,7 @@ def iris():
 ##### Iris
 ## Picamera
 
-    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
+#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
 #    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
@@ -114,7 +114,7 @@ def iris():
 
 
 #Initial
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
@@ -199,12 +199,6 @@ def eyelids():
 def validateImageAtPah(path):
 
     image = imread(path, IMREAD_GRAYSCALE)
-    # pupilCircle = irisP.findPupilInImage(image,True)
-    # blackedPupilImage = irisP.drawCirclesOnImage(image.copy(),[pupilCircle],True)
-    # irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
-    # #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    # code = dataCod.codificateIrisData(image,pupilCircle,irisCircle,40,0,True)
-
     irisP.showImage(image,"Original Image")
     irisP.segmentationOfIris(image,True)
 
@@ -259,11 +253,11 @@ def main():
     ###### Pupil
     #pupilV3()
     ###### Iris
-    #iris()
+    iris()
     #eyelids()
 
     #testUsageOfFourier()
-    testValidation()
+    #testValidation()
 main()
 
 

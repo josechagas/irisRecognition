@@ -56,13 +56,7 @@ def testIndependencyOf(codeA,maskA,codeB,maskB):
 
 def isItAValidIrisImage(irisImage):
 
-    pupilCircle = irisP.findPupilInImage(irisImage,True)
-    blackedPupilImage = irisP.drawCirclesOnImage(irisImage.copy(),[pupilCircle],True)
-    irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
-    #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeA = dataCod.codificateIrisData(irisImage,pupilCircle,irisCircle,40,0,True)
-    maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
-
+    data = codAndMaskOfIrisImage(irisImage)
 
     #After getting codeA and maskA we need to pass for all saved images and try to find some one that is compatible
     #Remenbar to execute it on more than one thread
@@ -72,3 +66,15 @@ def isItAValidIrisImage(irisImage):
 
     return True
 
+
+
+def codAndMaskOfIrisImage(irisImage):
+
+    pupilCircle = irisP.findPupilInImage(irisImage,True)
+    blackedPupilImage = irisP.drawCirclesOnImage(irisImage.copy(),[pupilCircle],True)
+    irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
+    #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
+    codeA = dataCod.codificateIrisData(irisImage,pupilCircle,irisCircle,40,0,True)
+    maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
+
+    return (codeA,maskA)

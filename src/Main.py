@@ -4,7 +4,6 @@ from cv2 import IMREAD_GRAYSCALE
 
 
 
-
 def main():
     print "ola"
 
