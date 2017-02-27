@@ -1,292 +1,136 @@
-import IrisProcessing as irisP
-import DataCodification as dataCod
-import operator
-
+# -*- coding: utf-8 -*-
+import IrisRecognition as irisR
+import RPi.GPIO as GPIO
+import time
+import savefile as savefile
+import os, os.path
+import numpy as np
 from cv2 import imread
 from cv2 import IMREAD_GRAYSCALE
-
-# def pupilV1():
-# ###### Pupil
-#
-#      irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L01.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R01.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L02.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R02.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L03.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R03.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L04.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R04.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R05.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L05.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R06.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L06.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R07.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L07.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L09.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R09.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R10.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L10.jpg")
-#
-#
-# def pupilV1_5():
-# ###### Pupil
-#
-# # initial
-#      irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L01.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R01.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L02.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R02.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L03.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R03.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L04.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R04.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R05.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L05.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R06.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L06.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R07.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L07.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L09.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R09.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001R10.jpg")
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/S1001L10.jpg")
-#
-#
-#
-# def pupilV2():
-# ###### Pupil
-#
-#
-# # # others
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/1.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/2.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/3.jpg")#3
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/4.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/5.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/6.jpg")#3
-#      irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/7.jpg")#not working
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/8.jpg")#not working
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/9.jpg")#3
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/10.jpg")#not working
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/11.jpg")#3
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/12.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/13.jpg")#3
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/IrisRecognition/Images/iris/others/14.jpg")#3
-#
-# def pupilV3():
-#
-# ## Picamera
-#
-#     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/5.jpg") #not working
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/6.jpg") #not working
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/7.jpg") #not working
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/8.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/9.jpg")
-# #    irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/10.jpg")
-#
-# # # others
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#3
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")#2
-# #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")#3
-#
-def iris():
-##### Iris
-## Picamera
-
-    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/2.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/3.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/4.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/5.jpg") #not working
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/6.jpg") #not working
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/7.jpg") #not working
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/8.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/9.jpg")
-#    validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/10.jpg")
+from threading import Thread
 
 
-#Initial
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R03.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R04.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R05.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R06.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L06.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R07.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L07.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L08.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R08.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L09.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R09.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R10.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L10.jpg")
-#
-# #others
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/7.jpg")#not working
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/8.jpg")#not working
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/9.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/10.jpg")#not working
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/11.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
+#Onde ficará salvo a codificação e a máscara da imagem
+DIR = '/home/pi/Desktop/pictures/cadastradas'
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
+#botão de tirar foto
+GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+#entrar no modo de cadastro
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+#LED azul
+GPIO.setup(17,GPIO.OUT)
+#LED amarelo
+GPIO.setup(27,GPIO.OUT)
+
+
+stop_flag = True
+
+#Método para alternar os leds simulando o carregamento
+def modoProcessamento():
+    while True:
+        if (stop_flag == False):
+            GPIO.output(17,GPIO.HIGH)
+            time.sleep(0.3)
+            GPIO.output(17,GPIO.LOW)
+            GPIO.output(27,GPIO.HIGH)
+            time.sleep(0.3)
+            GPIO.output(27,GPIO.LOW)
+        if (stop_flag == True):
+            GPIO.output(17,GPIO.HIGH)
+            GPIO.output(27,GPIO.HIGH)
+
+#Método para deixar os leds sempre ligados simulando o fim do processamento
+def modoFimDeProcessamento():
+    GPIO.output(17,GPIO.LOW)
+    GPIO.output(27,GPIO.LOW)
+
+#Método para salvar uma matriz num txt
+def matriz_to_txt(matriz, filename):
+     print("ok")
 
 
 
-def eyelids():
-##### Iris
+#Primeiro vamos tirar a foto da íris
+#Em seguida, vamos gerar a codificação e a máscara
+#Salva a codificação e a máscara da íris
 
-#Initial
-    testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L03.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R03.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R04.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R05.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R06.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L06.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R07.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L07.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L08.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R08.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L09.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R09.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R10.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L10.jpg")
-#
-# #others
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/7.jpg")#not working
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/8.jpg")#not working
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/9.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/10.jpg")#not working
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/11.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/12.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/13.jpg")
-#     testFindEyelidsOnImageAtPath("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/14.jpg")
-
-
-
-def validateImageAtPah(path):
-
-    image = imread(path, IMREAD_GRAYSCALE)
-    # pupilCircle = irisP.findPupilInImage(image,True)
-    # blackedPupilImage = irisP.drawCirclesOnImage(image.copy(),[pupilCircle],True)
-    # irisCircle = irisP.findIrisInImage(blackedPupilImage,pupilCircle,True)
-    # #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    # code = dataCod.codificateIrisData(image,pupilCircle,irisCircle,40,0,True)
-
-    irisP.showImage(image,"Original Image")
-    irisP.segmentationOfIris(image,True)
-
-    return True
-
-
-# https://docs.python.org/2/library/operator.html
-# Teste de indenependencia proposto por Daugman
-# Distancia de Hamming(Hamming Distance)
-#mais proximo de zero maior a possibilidade de serem iguais
-#Ex hd < 0.5 (mesma iris) hd > 0.5 (iris diferente)
-def testIndependencyOf(codeA,maskA,codeB,maskB):
-    rows = codeA.shape[0]
-    cols = codeA.shape[1]
-    # for row in range(0,rows):
-    #     for col in range(0,cols):
-    #hd2 = (operator.xor(codeA,codeB) & maskA & maskB)/(maskA & maskB)
-    #hd3 = (operator.xor(codeA.sum(),codeB.sum()) & maskA.sum() & maskB.sum())/(maskA.sum() & maskB.sum())
-    hd = 0
-    for row in range(0,rows):
-        for col in range(0,cols):
-            for i in range(0,1):
-                a = codeA[row][col][i]
-                b = codeB[row][col][i]
-                ma = maskA[row][col][i]
-                mb = maskB[row][col][i]
-                hd += (operator.xor(a,b) & ma & mb)/(ma & mb)
-    return hd/10000.0
-
-
-
-#--------------------------Test methods
-import numpy as np
-def testValidation():
-    imageA = imread("/home/pi/Desktop/pictures/9.jpg", IMREAD_GRAYSCALE)
-    pupilCircleA = irisP.findPupilInImage(imageA,True)
-    blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],True)
-    irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
-    #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeA = dataCod.codificateIrisData(imageA,pupilCircleA,irisCircleA,45,0,True)
-    maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
-
-    print("chega aqui")
-
-    imageB = imread("/home/pi/Desktop/pictures/9.jpg", IMREAD_GRAYSCALE)
-    pupilCircleB = irisP.findPupilInImage(imageB, True)
-    blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], True)
-    irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
-    # eyeImage, pupilCircsle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeB = dataCod.codificateIrisData(imageB, pupilCircleB, irisCircleB, 45, 0, True)
-    maskB = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
-
-    value = testIndependencyOf(codeA,maskA,codeB,maskB)
-    print(value)
-
-def testFindEyelidsOnImageAtPath(path):
-    image = imread(path, IMREAD_GRAYSCALE)
-    irisP.showImage(image,"Original Image")
-    irisP.findEyelidsInImage(image,True)
-
-def testUsageOfFourier():
-
-    #imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
-    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/1.jpg", IMREAD_GRAYSCALE)
-
-    value = dataCod.CV2_fourierTransformOf(imageA, True)
-
-    data = dataCod.CV2_invertFourierTransformOf(value)
-
-#-------------------------
 
 def main():
-    print "ola"
+    global stop_flag
+    th=Thread(target=modoProcessamento, args=())
+    th.start()
+    while True:
 
+        modo_validacao = GPIO.input(23)
+        modo_cadastro = GPIO.input(18)
 
-    ###### Pupil
-    #pupilV3()
-    ###### Iris
-    #iris()
-    #eyelids()
+        #Aqui entrará quando for para validar uma íris
+        #Irá bater a foto, codificar e mascarar
+        #Fazer a comparação com cada arquivo do banco de dados
+        #Se o output for menor ou igual a 0.5 led RGB verde (liberado)
+        #Se o output for maior que 0.5 led rgb vermelho (bloqueado)
+        if(modo_validacao == False):
+            print("entrou no modo de validação")
+            stop_flag = False
+            
+            #vamos supor que a imagem tirada foi essa:
+            foto = "/home/pi/Desktop/Images/iris/S1001R07.jpg"
+            image = imread(foto, IMREAD_GRAYSCALE)
 
-    #testUsageOfFourier()
-    testValidation()
+            #codificação e máscara da foto
+            codAndMask = irisR.codAndMaskOfIrisImage(image)
+            codIris = codAndMask[0]
+            maskIris = codAndMask[1]
+
+            #Agora iremos fazer a comparação com cada arquivo do banco de dados
+            #numero de arquivos dentro do banco
+            number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)
+
+            #laço para verificar cada arquivo (código e máscara)
+
+            for i in range(number):
+                diretorioCode = DIR + '/code' + str(i+1) + ".npy"
+                diretorioMask = DIR + '/mask' + str(i+1) + ".npy"
+                arquivoIrisCode = np.load(diretorioCode, None)
+                arquivoIrisMask = np.load(diretorioMask, None)
+
+                #testa a independência
+                independencia = irisR.testIndependencyOf(codIris, maskIris,arquivoIrisCode,arquivoIrisMask)
+                print(independencia)
+
+            #leds acesos
+            stop_flag = True
+            time.sleep(0.2)
+
+        #Aqui entrará quando apertar no botão de modo cadastro
+        #Deverá bater a foto e salvar a máscara e a codificação no banco de dados
+        if(modo_cadastro == False):
+            print("entrou no modo de cadastro")
+            #acende e apaga leds
+            stop_flag = False
+            
+            #vamos supor que a imagem tirada foi essa:
+            foto = "/home/pi/Desktop/Images/iris/S1001L01.jpg"
+            image = imread(foto, IMREAD_GRAYSCALE)
+
+            #codificação e máscara da foto
+            codAndMask = irisR.codAndMaskOfIrisImage(image)     
+
+            #salva no arquivo de imagens cadastrasas
+            number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)+1
+            diretorioCode = DIR + '/code' + str(number)
+            diretorioMask = DIR + '/mask' + str(number)
+            np.save(diretorioCode,codAndMask[0])
+            np.save(diretorioMask,codAndMask[1])
+            
+            #leds acesos
+            stop_flag = True
+            time.sleep(0.2)
 
 main()
 
