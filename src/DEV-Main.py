@@ -114,7 +114,7 @@ def iris():
 
 
 #Initial
-     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
@@ -137,7 +137,7 @@ def iris():
 #
 # #others
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/1.jpg")
-#     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
+     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/2.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/3.jpg")#with canny
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/4.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")
@@ -200,7 +200,16 @@ def validateImageAtPah(path):
 
     image = imread(path, IMREAD_GRAYSCALE)
     irisP.showImage(image,"Original Image")
-    irisP.segmentationOfIris(image,True)
+
+    #irisP.eyeLids(image,True)
+    #irisP.verticalCountours(image,True)
+
+    #irisP.showImage(image,"Original Image")
+    #irisP.horizontalCountours(image,True)
+
+    #irisP.countours(image,True)
+
+    irisP.segmentationOfPupil(image,True)
 
     return True
 
@@ -212,19 +221,19 @@ def validateImageAtPah(path):
 import numpy as np
 def testValidation():
     imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
-    pupilCircleA = irisP.findPupilInImage(imageA,True)
-    blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],True)
-    irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
+    pupilCircleA = irisP.findPupilInImage(imageA,False)
+    blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],False)
+    irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,False)
     #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeA = dataCod.codificateIrisData(imageA,pupilCircleA,irisCircleA,45,0,True)
+    codeA = dataCod.codificateIrisData(imageA,pupilCircleA,irisCircleA,45,0,False)
     maskA = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
 
     imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L05.jpg", IMREAD_GRAYSCALE)
-    pupilCircleB = irisP.findPupilInImage(imageB, True)
-    blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], True)
-    irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
+    pupilCircleB = irisP.findPupilInImage(imageB, False)
+    blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], False)
+    irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, False)
     # eyeImage, pupilCircsle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    codeB = dataCod.codificateIrisData(imageB, pupilCircleB, irisCircleB, 45, 0, True)
+    codeB = dataCod.codificateIrisData(imageB, pupilCircleB, irisCircleB, 45, 0, False)
     maskB = np.ones((codeA.shape[0],codeA.shape[1],2),np.uint8)
 
     value = irisR.testIndependencyOf(codeA,maskA,codeB,maskB)
@@ -244,6 +253,27 @@ def testUsageOfFourier():
 
     data = dataCod.CV2_invertFourierTransformOf(value)
 
+def testSaveOfCodAndMask():
+    image = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
+
+    values = irisR.codAndMaskOfIrisImage(image)
+
+    code = values[0]
+    mask = values[1]
+
+    np.save("/Users/joseLucas/Desktop/Python Projects/code_1",code,False,False)
+
+
+def testLoadOfCodAndMask():
+    image = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg", IMREAD_GRAYSCALE)
+
+    values = irisR.codAndMaskOfIrisImage(image)
+
+    code = values[0]
+    mask = values[1]
+
+    loadedCode = np.load("/Users/joseLucas/Desktop/Python Projects/code_1.npy",None,False,False)
+
 #-------------------------
 
 def main():
@@ -253,11 +283,13 @@ def main():
     ###### Pupil
     #pupilV3()
     ###### Iris
-    #iris()
+    iris()
     #eyelids()
 
     #testUsageOfFourier()
-    testValidation()
+    #testValidation()
+    #testSaveOfCodAndMask()
+    #testLoadOfCodAndMask()
 main()
 
 
