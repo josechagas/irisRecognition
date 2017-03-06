@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import math
+from scipy.signal import convolve2d
 
 from IrisProcessing import showImage
 
@@ -50,7 +51,7 @@ def normalizeIrisRegion(eyeImage,pupilCircle,irisCircle,pupilRadioOffset=0):
 #irisCircle = circle with the same localization of iris region
 #numbOfLins = number of lines you want the normalized iris region to have
 #pupilOffset =increment on pupilCenter ray to avoid for example getting some pupil information
-def RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset=0):
+def RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins=40,pupilOffset=0):
     numbOfCols = 360
     irisData = np.zeros((numbOfLins, numbOfCols), np.uint8)
     for p in np.arange(0.0, 1.0, 1.0 / numbOfLins):
@@ -160,21 +161,29 @@ def __extractCharacteristics(filteredIrisData):
     return irisCode
 
 
-#This method codificate the normalized irisData
-#irisData=Normalized irisRegion
-#showProcess=Present or not some steps of process as images
-def codificateIrisData(irisData,showProcess=False):
-
+def __codificate(irisData,showProcess=False):
     imgFT = __NP_fourierTransformOf(irisData,showProcess)
     rows = imgFT.shape[0]
     cols = imgFT.shape[1]
     gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
+
     filtered = imgFT*gFilter
+    #filtered = cv2.filter2D(imgFT,-1,gFilter)
+    #filtered = convolve2d(imgFT,gFilter)
+    if showProcess: showImage(filtered.astype(np.uint8),"filtered")
+
     #img = __CV2_invertFourierTransformOf(imgFT)
     #img = __NP_invertFourierTransformOf(imgFT)
     img = __NP_invertFourierTransformOf(filtered)
     if showProcess: showImage(img.astype(np.uint8),"Template")
+    return img
 
+
+#This method codificate the normalized irisData
+#irisData=Normalized irisRegion
+#showProcess=Present or not some steps of process as images
+def codificateNormImg(normImg,showProcess=False):
+    img = __codificate(normImg,showProcess)
     return __extractCharacteristics(img)
 
 #This method normalize the irisRegion localized on irisCircle and codificate it
@@ -184,21 +193,12 @@ def codificateIrisData(irisData,showProcess=False):
 #numbOfLins = number of lines you want the normalized iris region to have
 #pupilOffset =increment on pupilCenter ray to avoid for example getting some pupil information
 #showProcess=Present or not some steps of process as images
-def codificateIrisData(eyeImage,pupilCircle,irisCircle,numbOfLins=10,pupilOffset=0,showProcess=False):
 
-    irisData = RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins,pupilOffset)
-    if showProcess: showImage(irisData,"Normalized iris region")
+def codificateIrisData(eyeImage,pupilCircle,irisCircle,numbOfLins=40,pupilOffset=0,showProcess=False):
 
-    imgFT = __NP_fourierTransformOf(irisData,showProcess)
-    rows = imgFT.shape[0]
-    cols = imgFT.shape[1]
-    gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
-    filtered = imgFT*gFilter
-    #img = __CV2_invertFourierTransformOf(imgFT)
-    #img = __NP_invertFourierTransformOf(imgFT)
-    img = __NP_invertFourierTransformOf(filtered)
-    if showProcess: showImage(img.astype(np.uint8),"Template")
-
+    normIrisImg = RSM_NormIrisRegion(eyeImage,pupilCircle,irisCircle,numbOfLins,pupilOffset)
+    if showProcess: showImage(normIrisImg,"Normalized iris region")
+    img = __codificate(normIrisImg,showProcess)
     return __extractCharacteristics(img)
 
 
@@ -319,9 +319,21 @@ def __build2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
 
     gaborRadial[lins/2][cols/2] = 0###radial
 
+    #gaborRadial = cv2.blur(gaborRadial,(4,4))# last thing added
+    showImage((gaborRadial*100).astype(np.uint8),"radial part")
+
+    showImage((spread*100).astype(np.uint8),"angular part")
+
     filter = spread*gaborRadial
+    showImage((filter*100).astype(np.uint8),"filter part")
 
     return filter
 
 def cache2DLGFilter(codNumbOfLins=40):
-    __2DLogGaborFilter(codNumbOfLins,360,4.0,0.65)
+    # #waveLenght = 3.0#10.0# at least 2 #######
+    # f0 = 1.0/waveLenght
+    # #sigmaOnf = 0.55#0.75 ########
+
+    __2DLogGaborFilter(codNumbOfLins,360,8.0,0.55)
+    #__2DLogGaborFilter(codNumbOfLins,codNumbOfLins,4.0,0.65)
+    #__2DLogGaborFilter(5,5,4.0,0.65)
