@@ -275,14 +275,15 @@ def testValidation():
 
 
 def testValidationPiCam():
+    normalizationHeight = 20.0
 
-    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-1.jpg", IMREAD_GRAYSCALE)
+    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-2.jpg", IMREAD_GRAYSCALE)
     pupilCircleA = irisP.segmentationOfPupilPiCam(imageA,False)
     blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],False)
     irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
     #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
 
-    normImgA = dataCod.RSM_NormIrisRegion(imageA,pupilCircleA,irisCircleA,45,0)
+    normImgA = dataCod.RSM_NormIrisRegion(imageA,pupilCircleA,irisCircleA,normalizationHeight,0)
     codeA = dataCod.codificateNormImg(normImgA,True)#dataCod.codificateIrisData(imageA,pupilCircleA,irisCircleA,45,0,True)
 
     #maskNormImgA = irisP.maskOfNorImg(normImgA,True)
@@ -294,12 +295,12 @@ def testValidationPiCam():
     #maskA = np.ones((codeA.shape[0],codeA.shape[1]),np.uint8)
 
     #imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg", IMREAD_GRAYSCALE)
-    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/e-5.jpg", IMREAD_GRAYSCALE)
+    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-5.jpg", IMREAD_GRAYSCALE)#e-2 wrong
     pupilCircleB = irisP.segmentationOfPupilPiCam(imageB, False)
     blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], False)
     irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
     # eyeImage, pupilCircsle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
-    normImgB = dataCod.RSM_NormIrisRegion(imageB,pupilCircleB,irisCircleB,45,0)
+    normImgB = dataCod.RSM_NormIrisRegion(imageB,pupilCircleB,irisCircleB,normalizationHeight,0)
     codeB = dataCod.codificateNormImg(normImgB,True)#dataCod.codificateIrisData(imageB, pupilCircleB, irisCircleB, 45, 0, True)
 
     #maskNormImgB = irisP.maskOfNorImg(normImgB,True)
@@ -319,6 +320,24 @@ def testValidationPiCam():
 
     isSame = value < 0.65
     print value
+
+def simulateValidationOfImage():
+    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/e-2.jpg", IMREAD_GRAYSCALE)
+    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-3.jpg", IMREAD_GRAYSCALE)
+
+    try:
+        valuesA = irisR.codAndMaskOfIrisImage(imageA)
+        valuesB = irisR.codAndMaskOfIrisImage(imageB)
+
+        hd = irisR.testIndependencyOf(valuesA[0],valuesA[1],valuesB[0],valuesB[1])
+        return hd < 0.55
+    except Exception, e:
+        print e
+        return False
+
+
+
+
 
 
 def testGenerateMask():
@@ -393,6 +412,8 @@ def main():
     #testLoadOfCodAndMask()
     testValidationPiCam()
     #testGenerateMask()
+
+    #simulateValidationOfImage()
 main()
 
 

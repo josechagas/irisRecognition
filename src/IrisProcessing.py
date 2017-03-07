@@ -181,6 +181,7 @@ def __irisCircleOnImageV1(eyeImage,pupilCircle,showProcess=False):
             print "teste"
         if objCircles is None:
             print"No Circles were found"
+            raise Exception("No Circles were found")
         elif objCircles.__len__() > 0:
             circles = objCircles[0]
             if circles.__len__() > 0:
@@ -571,6 +572,7 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
 
     if objCircles is None:
         print "nenhum circulo encontrado"
+        raise Exception("No Circles were found")
     elif objCircles.__len__() > 0:
         circles = objCircles[0]
         if circles.__len__() > 0:
@@ -628,15 +630,21 @@ def findPupilInImage(image,showProcess=False):
         print e
 
 def findPupilInRaspImage(image, showProcess=False):
-    try:
-        pupilCircle = __pupilCircleOnImageRaspCam(image, showProcess)
-        if showProcess:
-            copy = image.copy()
-            drawCirclesOnImage(copy, [pupilCircle])
-            showImage(copy, "Location of pupil")
-        return pupilCircle
-    except Exception, e:
-        print e
+    pupilCircle = __pupilCircleOnImageRaspCam(image, showProcess)
+    if showProcess:
+        copy = image.copy()
+        drawCirclesOnImage(copy, [pupilCircle])
+        showImage(copy, "Location of pupil")
+    return pupilCircle
+    # try:
+    #     pupilCircle = __pupilCircleOnImageRaspCam(image, showProcess)
+    #     if showProcess:
+    #         copy = image.copy()
+    #         drawCirclesOnImage(copy, [pupilCircle])
+    #         showImage(copy, "Location of pupil")
+    #     return pupilCircle
+    # except Exception, e:
+    #     print e
 
 
 # Tries to find the pupil location on a image and returns it

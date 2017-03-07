@@ -319,7 +319,7 @@ def __build2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
 
     gaborRadial[lins/2][cols/2] = 0###radial
 
-    #gaborRadial = cv2.blur(gaborRadial,(4,4))# last thing added
+    #gaborRadial = cv2.blur(gaborRadial,(2,2))# last thing added
     showImage((gaborRadial*100).astype(np.uint8),"radial part")
 
     showImage((spread*100).astype(np.uint8),"angular part")
