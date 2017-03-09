@@ -389,6 +389,6 @@ def cache2DLGFilter(codNumbOfLins=40):
     # f0 = 1.0/waveLenght
     # #sigmaOnf = 0.55#0.75 ########
 
-    __2DLogGaborFilter(codNumbOfLins,360,10.0,0.55)
+    __2DLogGaborFilter(codNumbOfLins,360,3.0,1.55)
     #__2DLogGaborFilter(codNumbOfLins,codNumbOfLins,4.0,0.65)
     #__2DLogGaborFilter(5,5,4.0,0.65)

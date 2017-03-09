@@ -277,7 +277,7 @@ def testValidation():
 def testValidationPiCam():
     normalizationHeight = 20.0
 
-    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/e-2.jpg", IMREAD_GRAYSCALE)
+    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-2.jpg", IMREAD_GRAYSCALE)
     pupilCircleA = irisP.segmentationOfPupilPiCam(imageA,False)
     blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],False)
     irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
@@ -295,7 +295,7 @@ def testValidationPiCam():
     #maskA = np.ones((codeA.shape[0],codeA.shape[1]),np.uint8)
 
     #imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L04.jpg", IMREAD_GRAYSCALE)
-    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/e-3.jpg", IMREAD_GRAYSCALE)#e-2 wrong
+    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/d-5.jpg", IMREAD_GRAYSCALE)#e-2 wrong
     pupilCircleB = irisP.segmentationOfPupilPiCam(imageB, False)
     blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], False)
     irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
