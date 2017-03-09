@@ -168,8 +168,7 @@ def __codificate(irisData,showProcess=False):
     gFilter = __2DLogGaborFilter(rows,cols,4.0,0.65)
 
     filtered = imgFT*gFilter
-    #filtered = cv2.filter2D(imgFT,-1,gFilter)
-    #filtered = convolve2d(imgFT,gFilter)
+    #filtered = __gFilter(imgFT)
     if showProcess: showImage(filtered.astype(np.uint8),"filtered")
 
     #img = __CV2_invertFourierTransformOf(imgFT)
@@ -319,7 +318,7 @@ def __build2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
 
     gaborRadial[lins/2][cols/2] = 0###radial
 
-    #gaborRadial = cv2.blur(gaborRadial,(2,2))# last thing added
+    #gaborRadial = cv2.blur(gaborRadial,(4,4))# last thing added
     showImage((gaborRadial*100).astype(np.uint8),"radial part")
 
     showImage((spread*100).astype(np.uint8),"angular part")
@@ -329,11 +328,67 @@ def __build2DLogGaborFilter(lins,cols,waveLenght,sigmaOnf):
 
     return filter
 
+
+def __gFilter(image):
+    cols = image.shape[1]
+    lins = image.shape[0]
+    x = -(cols/2.0)
+    y = -(lins/2.0)
+
+    def transf_func(w,o):
+        w0 = 1/10.0
+        dw = 0.55
+        o0 = 0
+        do = math.pi/8.0
+        radialPart = -((np.log(w/w0)/np.log(dw))**2)/2
+        angularPart = np.exp(-(((o - o0)/do)**2)/2.0)
+        return radialPart*angularPart
+
+
+    filteredImage = np.zeros((lins,cols))
+    for lin in range(0,lins):
+        yLin = (y + lin)/lins
+        for col in range(0, cols):
+            xCol = (x + col)/cols
+
+            f = math.sqrt(((xCol)**2 + (yLin)**2))#math.sqrt((((x + col)/cols)**2 + ((y + lin)/lins)**2)/2.0)
+            if lin == lins/2 and col == cols/2:
+                f = 1
+            theta = math.atan2(-yLin, xCol)
+            sinTheta = math.sin(theta)
+            cosTheta = math.cos(theta)
+
+            angl = col * math.pi / 180
+            ds = sinTheta * math.cos(angl) - cosTheta * math.sin(angl)
+            dc = cosTheta * math.cos(angl) + sinTheta * math.sin(angl)
+
+            dTheta = abs(math.atan2(ds, dc))
+            filteredImage[lin][col] = transf_func(f,dTheta)*image[lin][col]
+
+    return filteredImage
+
+
+def __daugmanGFilter():
+    i = 0
+    w = 0
+    o = 0
+    o0 = 0
+
+    r = 0
+    r0 = 0
+    a = 0
+    b = 0
+
+    partOne = np.exp(-i*w*(o - o0))
+    partTwo = np.exp(-((r - r0)/a)**2)
+    partThree = np.exp(-((o - o0)/b)**2)
+
+
 def cache2DLGFilter(codNumbOfLins=40):
     # #waveLenght = 3.0#10.0# at least 2 #######
     # f0 = 1.0/waveLenght
     # #sigmaOnf = 0.55#0.75 ########
 
-    __2DLogGaborFilter(codNumbOfLins,360,8.0,0.55)
+    __2DLogGaborFilter(codNumbOfLins,360,10.0,0.55)
     #__2DLogGaborFilter(codNumbOfLins,codNumbOfLins,4.0,0.65)
     #__2DLogGaborFilter(5,5,4.0,0.65)

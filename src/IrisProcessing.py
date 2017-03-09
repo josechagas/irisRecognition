@@ -571,6 +571,14 @@ def __pupilCircleOnImageRaspCam(eyeImage,showProcess=False):
         objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 30, 100)
 
     if objCircles is None:
+        print "quarta tentativa"
+
+        processedImage = eyeImage
+        processedImage = cv2.bilateralFilter(processedImage, 30, 10, 50, 25)
+        if showProcess:  showImage(processedImage, "After Apply Bilateral filter")
+        objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 0, 70)
+
+    if objCircles is None:
         print "nenhum circulo encontrado"
         raise Exception("No Circles were found")
     elif objCircles.__len__() > 0:
@@ -909,6 +917,14 @@ def segmentationOfPupilPiCam(eyeImage,showProcess=False):
         if showProcess:  showImage(processedImage, "After Apply Canny")
         objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 30, 100)
         #objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 30, 150)
+    if objCircles is None:
+        print "quarta tentativa"
+
+        processedImage = eyeImage
+        processedImage = cv2.bilateralFilter(processedImage, 30, 10, 50, 25)
+        if showProcess:  showImage(processedImage, "After Apply Bilateral filter")
+        objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 0, 70)
+        # objCircles = cv2.HoughCircles(processedImage, HOUGH_GRADIENT, 2, center[0] / 4, 30, 150)
 
     if objCircles is None:
         print "nenhum circulo encontrado"

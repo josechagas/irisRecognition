@@ -24,41 +24,100 @@ def __HammingDistanceOf(codeA,maskA,codeB,maskB):
     #             ma = maskA[row][col][i]
     #             mb = maskB[row][col][i]
     #             hd += (operator.xor(a,b) & ma & mb)/(ma & mb)
+
+
+
     #improved way (working)
+    # for row in range(0,rows):
+    #     for col in range(0,cols/2):
+    #         for i in range(0,2):
+    #             a = codeA[row][col][i]
+    #             b = codeB[row][col][i]
+    #             ma = maskA[row][col]
+    #             mb = maskB[row][col]
+    #             hd1 += (operator.xor(a,b) & (ma & mb))#/(ma & mb)
+    #
+    #             hd2 += operator.xor(a,b)
+    #
+    #             delta = (cols/2) + col
+    #             a = codeA[row][delta][i]
+    #             b = codeB[row][delta][i]
+    #             ma = maskA[row][delta]#[i]
+    #             mb = maskB[row][delta]#[i]
+    #             hd1 += (operator.xor(a,b) & (ma & mb))#/(ma & mb)
+    #
+    #             hd2 += operator.xor(a,b)
+
+    difCode = np.zeros((rows,cols),np.uint8)
+    equalCode = np.zeros((rows,cols),np.uint8)
+    resultMask = maskA & maskB
     for row in range(0,rows):
         for col in range(0,cols/2):
-
-            for i in range(0,2):
-                a = codeA[row][col][i]
-                b = codeB[row][col][i]
-                ma = maskA[row][col]#[i]
-                mb = maskB[row][col]#[i]
-                hd1 += (operator.xor(a,b) & (ma & mb))#/(ma & mb)
-
-                hd2 += operator.xor(a,b)
-
-                delta = (cols/2) + col
-                a = codeA[row][delta][i]
-                b = codeB[row][delta][i]
-                ma = maskA[row][delta]#[i]
-                mb = maskB[row][delta]#[i]
-                hd1 += (operator.xor(a,b) & (ma & mb))#/(ma & mb)
-
-                hd2 += operator.xor(a,b)
-
-    hd1_maxValue = float((maskA & maskB).sum())#(codeA.shape[0]*codeA.shape[1]*codeA.shape[2]) - (maskA.shape[0]*maskA.shape[1] - (maskA & maskB).sum())
-    hd = hd1/hd1_maxValue #10000.0
-    mask_maxValue = float((maskA & maskB).sum())
-    hdx = hd2/float(codeA.shape[0]*codeA.shape[1]*codeA.shape[2] - hd1_maxValue)
-    hdy = hd1/float(codeA.shape[0]*codeA.shape[1]*codeA.shape[2] - hd1_maxValue)
+            a = codeA[row][col]
+            b = codeB[row][col]
+            equalityValue = (a == b).sum()
+            if equalityValue == 2:
+                equalCode[row][col] = 1
+            else:
+                difCode[row][col] = 1
 
 
-    #hd2s = (operator.xor(codeA, codeB).sum() & (maskA & maskB).sum()) / float((maskA & maskB).sum())
-    hd2s = (operator.xor(codeA, codeB).sum() & (maskA & maskB).sum()) / mask_maxValue
-    hd2s2 = (operator.xor(codeA.sum(), codeB.sum()) & (maskA.sum() & maskB.sum())) / float(maskA.sum() & maskB.sum())
-    #hd2s2 = (operator.xor(np.reshape(codeA,(45,360*2)), np.reshape(codeB,(45,360*2))).sum() & (maskA & maskB).sum()) / mask_maxValue
+            delta = (cols/2) + col
+            a = codeA[row][delta]
+            b = codeB[row][delta]
+            equalityValue = (a == b).sum()
+            if equalityValue == 2:
+                equalCode[row][delta] = 1
+            else:
+                difCode[row][delta] = 1
 
-    return hd
+    dif = (difCode & resultMask).sum()
+    equal = (equalCode & resultMask).sum()
+    #equalityDegree = equal/float(rows*cols)
+    #difDegree = dif/float(rows*cols)
+    mask_maxValue = float(resultMask.sum())
+    equalityDegree = equal / mask_maxValue
+    difDegree = dif / mask_maxValue
+
+
+    #cA = np.reshape(codeA,(45,360*2))
+    #cB = np.reshape(codeB,(45,360*2))
+    #dif2 = ((codeA == codeB).astype(np.uint8) & resultMask).sum()/mask_maxValue #(operator.xor(), np.reshape(codeB,(45,360*2))).sum() & (maskA & maskB).sum()) / mask_maxValue
+
+
+    # hd1_maxValue = float((maskA & maskB).sum())#(codeA.shape[0]*codeA.shape[1]*codeA.shape[2]) - (maskA.shape[0]*maskA.shape[1] - (maskA & maskB).sum())
+    # hd = 1 - hd1/hd1_maxValue #10000.0
+    # mask_maxValue = float((maskA & maskB).sum())
+    # #hdx = hd2/float(codeA.shape[0]*codeA.shape[1]*codeA.shape[2] - hd1_maxValue)
+    # #hdy = hd1/float(codeA.shape[0]*codeA.shape[1]*codeA.shape[2] - hd1_maxValue)
+    #
+    # hdx = hd2 / float(codeA.shape[0] * codeA.shape[1] - hd1_maxValue)
+    # hdy = hd1 / float(codeA.shape[0] * codeA.shape[1] - hd1_maxValue)
+    #
+    # #hd2s = (operator.xor(codeA, codeB).sum() & (maskA & maskB).sum()) / float((maskA & maskB).sum())
+    # hd2s = (operator.xor(codeA, codeB).sum() & (maskA & maskB).sum()) / mask_maxValue
+    # hd2s2 = (operator.xor(codeA.sum(), codeB.sum()) & (maskA.sum() & maskB.sum())) / float(maskA.sum() & maskB.sum())
+    # #hd2s2 = (operator.xor(np.reshape(codeA,(45,360*2)), np.reshape(codeB,(45,360*2))).sum() & (maskA & maskB).sum()) / mask_maxValue
+
+    return difDegree#round(difDegree*10)/10.0 #round(hd*10)/10.0
+
+#(WED - Weighted Euclidean Distance)
+def __WEDOf(codeA,codeB):
+    rows = codeA.shape[0]
+    cols = codeA.shape[1]
+
+    codeA = np.reshape(codeA,(rows,cols*2))
+    codeB = np.reshape(codeB,(rows,cols*2))
+
+    values = np.zeros((rows,cols*2))
+
+    for row in range(0,rows):
+        fa = codeA[row]
+        fb = codeB[row]
+        dp = fb.std()
+        values[row] = ((fa - fb)**2)/(dp**2)
+
+    return values.sum()/10000.0
 
 
 # https://docs.python.org/2/library/operator.html
@@ -69,7 +128,7 @@ def __HammingDistanceOf(codeA,maskA,codeB,maskB):
 
 #This method determines using the Distance of Hamming the independency of two normalized and codificated iris images
 def testIndependencyOf(codeA,maskA,codeB,maskB):
-    # left and right shift are executed to give more precision
+    # # left and right shift are executed to give more precision
     codeAL = np.roll(codeA,-2)#left
     maskAL = np.roll(maskA,-2)#left
     #codeBL = np.roll(codeB,-2)#left
@@ -85,8 +144,12 @@ def testIndependencyOf(codeA,maskA,codeB,maskB):
     values = [value,valueLeftShift,valueRightShift]
     average = (value + valueLeftShift + valueRightShift)/3.0
     smallerValue = np.amin(values)
+    median = np.median(values)
 
-    return smallerValue
+    #value = __WEDOf(codeA,codeB)
+    #return value
+
+    return median
 
 
 
