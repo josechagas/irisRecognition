@@ -8,6 +8,12 @@ import numpy as np
 from cv2 import imread
 from cv2 import IMREAD_GRAYSCALE
 from threading import Thread
+from picamera import PiCamera
+
+#Módulo Camera
+camera = PiCamera()
+camera.rotation = 180
+camera.resolution = (320, 288)
 
 
 #Onde ficará salvo a codificação e a máscara da imagem
@@ -27,8 +33,27 @@ GPIO.setup(17,GPIO.OUT)
 #LED amarelo
 GPIO.setup(27,GPIO.OUT)
 
+#LED RGB VERDE
+GPIO.setup(26,GPIO.OUT)
+
+#LED RGB VERMELHO
+GPIO.setup(19,GPIO.OUT)
+
 
 stop_flag = True
+
+def offRGB():
+    GPIO.output(26,0)
+    GPIO.output(19,0)
+
+def acendeRGB(cor):
+    if(cor == "verde"):
+        GPIO.output(26,1)
+        GPIO.output(19,0)
+    else:
+        GPIO.output(19,1)
+        GPIO.output(26,0)
+    
 
 #Método para alternar os leds simulando o carregamento
 def modoProcessamento():
@@ -49,21 +74,13 @@ def modoFimDeProcessamento():
     GPIO.output(17,GPIO.LOW)
     GPIO.output(27,GPIO.LOW)
 
-#Método para salvar uma matriz num txt
-def matriz_to_txt(matriz, filename):
-     print("ok")
-
-
-
-#Primeiro vamos tirar a foto da íris
-#Em seguida, vamos gerar a codificação e a máscara
-#Salva a codificação e a máscara da íris
-
 
 def main():
     global stop_flag
     th=Thread(target=modoProcessamento, args=())
     th.start()
+    camera.start_preview()
+    offRGB()
     while True:
 
         modo_validacao = GPIO.input(23)
@@ -75,64 +92,111 @@ def main():
         #Se o output for menor ou igual a 0.5 led RGB verde (liberado)
         #Se o output for maior que 0.5 led rgb vermelho (bloqueado)
         if(modo_validacao == False):
-            print("entrou no modo de validação")
-            stop_flag = False
-            
-            #vamos supor que a imagem tirada foi essa:
-            foto = "/home/pi/Desktop/Images/iris/S1001R07.jpg"
-            image = imread(foto, IMREAD_GRAYSCALE)
+            try:
+                #numero de arquivos dentro do banco
+                number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)
 
-            #codificação e máscara da foto
-            codAndMask = irisR.codAndMaskOfIrisImage(image)
-            codIris = codAndMask[0]
-            maskIris = codAndMask[1]
+                #print("entrou no modo de validação")
+                stop_flag = False
+                
+                #vamos supor que a imagem tirada foi essa:
+                #time.sleep(0.3)
+                print("nova foto")
+                camera.capture('/home/pi/Desktop/pictures/temp/imagem' + str(number) + ".jpg" )
+                time.sleep(3)
+                camera.stop_preview()
+                foto = "/home/pi/Desktop/pictures/temp/imagem" + str(number) + ".jpg"
+                #foto = '/home/pi/Desktop/Images/iris/S1001L06.jpg'
+                image = imread(foto, IMREAD_GRAYSCALE)
 
-            #Agora iremos fazer a comparação com cada arquivo do banco de dados
-            #numero de arquivos dentro do banco
-            number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)
+                #codificação e máscara da foto
+                codAndMask = irisR.codAndMaskOfIrisImage(image)
+                codIris = codAndMask[0]
+                maskIris = codAndMask[1]
 
-            #laço para verificar cada arquivo (código e máscara)
+                #Agora iremos fazer a comparação com cada arquivo do banco de dados
+                #laço para verificar cada arquivo (código e máscara)
 
-            for i in range(number):
-                diretorioCode = DIR + '/code' + str(i+1) + ".npy"
-                diretorioMask = DIR + '/mask' + str(i+1) + ".npy"
-                arquivoIrisCode = np.load(diretorioCode, None)
-                arquivoIrisMask = np.load(diretorioMask, None)
+                for i in range(number):
+                    diretorioCode = DIR + '/code' + str(i+1) + ".npy"
+                    diretorioMask = DIR + '/mask' + str(i+1) + ".npy"
+                    arquivoIrisCode = np.load(diretorioCode, None)
+                    arquivoIrisMask = np.load(diretorioMask, None)
 
-                #testa a independência
-                independencia = irisR.testIndependencyOf(codIris, maskIris,arquivoIrisCode,arquivoIrisMask)
-                print(independencia)
+                    #testa a independência
+                    independencia = irisR.testIndependencyOf(codIris, maskIris,arquivoIrisCode,arquivoIrisMask)
+                    #independencia = independencia - 0.3
+                    print(float(independencia))
+                    if (float(independencia) <= 0.6):
+                        stop_flag = True
+                        print("ACESSO LIBERADO: VERDE")
+                        acendeRGB("verde")
+                        time.sleep(5)
+                        offRGB()
+                        break
 
-            #leds acesos
-            stop_flag = True
-            time.sleep(0.2)
+                    if (float(independencia) > 0.6):
+                        stop_flag = True
+                        print("ACESSO BLOQUEADO: LED VERMELHO")
+                        acendeRGB("vermelho")
+                        time.sleep(5)
+                        offRGB()
+
+                stop_flag = True
+                time.sleep(0.2)
+            except Exception, e:
+                stop_flag = True
+                acendeRGB("vermelho")
+                time.sleep(5)
+                offRGB()
+                print e
 
         #Aqui entrará quando apertar no botão de modo cadastro
         #Deverá bater a foto e salvar a máscara e a codificação no banco de dados
         if(modo_cadastro == False):
-            print("entrou no modo de cadastro")
-            #acende e apaga leds
-            stop_flag = False
-            
-            #vamos supor que a imagem tirada foi essa:
-            foto = "/home/pi/Desktop/Images/iris/S1001L01.jpg"
-            image = imread(foto, IMREAD_GRAYSCALE)
+            try:
+                number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)+1
+                
+                print("entrou no modo de cadastro")
+                #acende e apaga leds
+                stop_flag = False
+                
+                #vamos supor que a imagem tirada foi essa:
+                #time.sleep(0.3)
+                print("nova foto")
+                camera.capture('/home/pi/Desktop/pictures/temp/imagem' + str(number) + ".jpg" )
+                time.sleep(3)
+                camera.stop_preview()
+                foto = "/home/pi/Desktop/pictures/temp/imagem" + str(number) + ".jpg"
+                #foto = '/home/pi/Desktop/Images/iris/S1001L01.jpg'
+                image = imread(foto, IMREAD_GRAYSCALE)
 
-            #codificação e máscara da foto
-            codAndMask = irisR.codAndMaskOfIrisImage(image)     
+                #codificação e máscara da foto
+                codAndMask = irisR.codAndMaskOfIrisImage(image)     
 
-            #salva no arquivo de imagens cadastrasas
-            number = ((len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))/2)+1
-            diretorioCode = DIR + '/code' + str(number)
-            diretorioMask = DIR + '/mask' + str(number)
-            np.save(diretorioCode,codAndMask[0])
-            np.save(diretorioMask,codAndMask[1])
+                #salva no arquivo de imagens cadastrasas
+                diretorioCode = DIR + '/code' + str(number)
+                diretorioMask = DIR + '/mask' + str(number)
+                np.save(diretorioCode,codAndMask[0])
+                np.save(diretorioMask,codAndMask[1])
+                
+                #leds acesos
+                stop_flag = True
+                time.sleep(0.2)
+                acendeRGB("verde")
+                time.sleep(5)
+                offRGB()
+
+            except Exception, e:
+                stop_flag = True
+                acendeRGB("vermelho")
+                time.sleep(5)
+                offRGB()
+                print e
             
-            #leds acesos
-            stop_flag = True
-            time.sleep(0.2)
 
 main()
+
 
 
 

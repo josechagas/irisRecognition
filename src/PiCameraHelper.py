@@ -22,9 +22,11 @@ def takePicture(grayScale=False,showProcess=False):
     sleep(0.3)
     camera.capture(rawCapture, format="bgr")
     capturedImage = rawCapture.array
+    print capturedImage[0][0]
     if showProcess: camera.stop_preview()
     return capturedImage
 
 
 def save(image):
+    
     print "as"

@@ -6,6 +6,8 @@ import IrisRecognition as irisR
 from cv2 import imread
 from cv2 import IMREAD_GRAYSCALE
 
+
+
 # def pupilV1():
 # ###### Pupil
 #
@@ -97,7 +99,7 @@ from cv2 import IMREAD_GRAYSCALE
 # #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/5.jpg")#2
 # #     irisP.tryToShowPupil("/Users/joseLucas/Desktop/Python Projects/Images/iris/others/6.jpg")#3
 #
-def iris():
+def iris(baseDir):
 ##### Iris
 ## Picamera
 
@@ -114,7 +116,7 @@ def iris():
 
 
 #Initial
-     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L01.jpg")
+     validateImageAtPah(baseDir+"/iris/S1001L01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R01.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001L02.jpg")
 #     validateImageAtPah("/Users/joseLucas/Desktop/Python Projects/Images/iris/S1001R02.jpg")
@@ -200,7 +202,14 @@ def validateImageAtPah(path):
 
     image = imread(path, IMREAD_GRAYSCALE)
     irisP.showImage(image,"Original Image")
-    irisP.segmentationOfIris(image,True)
+    irisP.segmentationOfPupil(image,True)
+
+    return True
+
+def validateImage(image):
+
+    irisP.showImage(image,"Original Image")
+    irisP.segmentationOfPupil(image,True)
 
     return True
 
@@ -244,20 +253,33 @@ def testUsageOfFourier():
 
     data = dataCod.CV2_invertFourierTransformOf(value)
 
+
+import PiCameraHelper as picam
+def takePicture():
+     print "foi"
+     picam.defineResolution(320,288)
+     picture = picam.takePicture()
+     return irisP.imgToGrayScale(picture)
+
 #-------------------------
 
 def main():
     print "ola DEV-MAIN"
-
+    raspBaseDir = "/home/pi/Desktop/Images"
+    macBaseDir = "/Users/joseLucas/Desktop/Python Projects/Images"
 
     ###### Pupil
     #pupilV3()
     ###### Iris
-    iris()
+    #iris(raspBaseDir)
     #eyelids()
 
     #testUsageOfFourier()
     #testValidation()
+
+    ### PiCam
+    validateImage(takePicture())
+
 main()
 
 
