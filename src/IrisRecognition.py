@@ -99,7 +99,7 @@ def __HammingDistanceOf(codeA,maskA,codeB,maskB):
     # hd2s2 = (operator.xor(codeA.sum(), codeB.sum()) & (maskA.sum() & maskB.sum())) / float(maskA.sum() & maskB.sum())
     # #hd2s2 = (operator.xor(np.reshape(codeA,(45,360*2)), np.reshape(codeB,(45,360*2))).sum() & (maskA & maskB).sum()) / mask_maxValue
 
-q    return difDegree#round(difDegree*10)/10.0 #round(hd*10)/10.0
+    return difDegree#round(difDegree*10)/10.0 #round(hd*10)/10.0
 
 #(WED - Weighted Euclidean Distance)
 def __WEDOf(codeA,codeB):

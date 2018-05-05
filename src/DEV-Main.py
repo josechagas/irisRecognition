@@ -242,7 +242,7 @@ def testValidation():
     irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
     #eyeImage, pupilCircle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
 
-    normImgA = dataCod.RSM_NormIrisRegion(imageA,pupilCircleA,irisCircleA,45,0)
+    normImgA = dataCod.RSM_NormIrisRegion(imageA,pupilCircleA,irisCircleA,20,0)
     codeA = dataCod.codificateNormImg(normImgA,True)#dataCod.codificateIrisData(imageA,pupilCircleA,irisCircleA,45,0,True)
 
     #maskNormImgA = irisP.maskOfNorImg(normImgA,True)
@@ -257,7 +257,7 @@ def testValidation():
     irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
     # eyeImage, pupilCircsle, irisCircle, numbOfLins = 10, pupilOffset = 0, showProcess = False):
 
-    normImgB = dataCod.RSM_NormIrisRegion(imageB, pupilCircleB, irisCircleB, 45, 0)
+    normImgB = dataCod.RSM_NormIrisRegion(imageB, pupilCircleB, irisCircleB, 20, 0)
     codeB = dataCod.codificateNormImg(normImgB,True)  # dataCod.codificateIrisData(imageB, pupilCircleB, irisCircleB, 45, 0, True)
 
     #maskNormImgB = irisP.maskOfNorImg(normImgB, True)
@@ -321,6 +321,35 @@ def testValidationPiCam():
 
     isSame = value < 0.56
     print value
+
+
+def testValidationMMUDB():
+    imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/MMU Iris Database/1/left/aeval1.bmp", IMREAD_GRAYSCALE)
+
+    pupilCircleA = irisP.findPupilInImage(imageA,False)
+    blackedPupilImageA = irisP.drawCirclesOnImage(imageA.copy(),[pupilCircleA],True)
+    irisCircleA = irisP.findIrisInImage(blackedPupilImageA,pupilCircleA,True)
+
+    normImgA = dataCod.RSM_NormIrisRegion(imageA, pupilCircleA, irisCircleA, 20, 0)
+    codeA = dataCod.codificateNormImg(normImgA,True)
+    maskA = irisP.maskOfNormImg(normImgA, True)
+
+    imageB = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/MMU Iris Database/1/left/aeval2.bmp", IMREAD_GRAYSCALE)
+
+    pupilCircleB = irisP.findPupilInImage(imageB,False)
+    blackedPupilImageB = irisP.drawCirclesOnImage(imageB.copy(), [pupilCircleB], True)
+    irisCircleB = irisP.findIrisInImage(blackedPupilImageB, pupilCircleB, True)
+
+    normImgB = dataCod.RSM_NormIrisRegion(imageB, pupilCircleB, irisCircleB, 20, 0)
+    codeB = dataCod.codificateNormImg(normImgB,True)
+    maskB = irisP.maskOfNormImg(normImgB, True)
+
+    value = irisR.testIndependencyOf(codeA,maskA,codeB,maskB)
+
+    isSame = value < 0.42
+
+    print value
+
 
 def simulateValidationOfImage():
     imageA = imread("/Users/joseLucas/Desktop/Python Projects/Images/iris/picamera/e-2.jpg", IMREAD_GRAYSCALE)
@@ -409,9 +438,9 @@ def main():
     #testValidation()
     #testSaveOfCodAndMask()
     #testLoadOfCodAndMask()
-    testValidationPiCam()
+    #testValidationPiCam()
+    testValidationMMUDB()
     #testGenerateMask()
-
     #simulateValidationOfImage()
 main()
 
